@@ -18885,481 +18885,679 @@ class SocialMediaValidator {
 
 // ==================== ADVANCED GOOGLE DORKING ====================
 
-async function megaGoogleDork(query, type) {
-    const dorkSets = {
-    email: [
-        // Basic searches
-        `"${query}"`,
-        `"${query}" -site:${query.split('@')[1]}`,
-        
-        // Professional networks & code repositories
-        `"${query}" (site:linkedin.com OR site:github.com OR site:gitlab.com)`,
-        `"${query}" site:bitbucket.org OR site:sourceforge.net OR site:codepen.io`,
-        `"${query}" site:stackoverflow.com OR site:stackexchange.com OR site:superuser.com`,
-        `"${query}" site:dev.to OR site:medium.com OR site:hashnode.com`,
-        
-        // Documents & files
-        `"${query}" (filetype:pdf OR filetype:xlsx OR filetype:docx OR filetype:csv)`,
-        `"${query}" (filetype:ppt OR filetype:pptx OR filetype:doc OR filetype:txt)`,
-        `"${query}" (filetype:xls OR filetype:json OR filetype:xml OR filetype:log)`,
-        `"${query}" filetype:sql OR filetype:db OR filetype:sqlite OR filetype:mdb`,
-        `"${query}" filetype:env OR filetype:config OR filetype:ini OR filetype:yml`,
-        `"${query}" filetype:bak OR filetype:backup OR filetype:old`,
-        
-        // Paste sites & text dumps
-        `"${query}" site:pastebin.com OR site:ghostbin.com OR site:rentry.co`,
-        `"${query}" site:justpaste.it OR site:paste.ee OR site:hastebin.com`,
-        `"${query}" site:controlc.com OR site:paste2.org OR site:privatebin.net`,
-        `"${query}" site:ideone.com OR site:codepad.org OR site:dpaste.com`,
-        
-        // Project management & collaboration
-        `"${query}" site:trello.com OR site:atlassian.net OR site:asana.com`,
-        `"${query}" site:notion.so OR site:monday.com OR site:clickup.com`,
-        `"${query}" site:basecamp.com OR site:airtable.com`,
-        
-        // Cloud storage & docs
-        `"${query}" site:docs.google.com OR site:drive.google.com`,
-        `"${query}" site:onedrive.live.com OR site:dropbox.com`,
-        `"${query}" site:box.com OR site:mega.nz OR site:mediafire.com`,
-        `"${query}" site:scribd.com OR site:slideshare.net OR site:issuu.com`,
-        `"${query}" site:docdroid.net OR site:docdroid.com`,
-        
-        // Social media platforms
-        `"${query}" (site:facebook.com OR site:instagram.com OR site:twitter.com)`,
-        `"${query}" (site:tiktok.com OR site:snapchat.com OR site:pinterest.com)`,
-        `"${query}" site:vk.com OR site:ok.ru OR site:myspace.com`,
-        `"${query}" site:tumblr.com OR site:blogger.com OR site:wordpress.com`,
-        
-        // Forums & communities
-        `"${query}" site:reddit.com OR site:quora.com OR site:stackexchange.com`,
-        `"${query}" site:discord.gg OR site:discordapp.com OR site:discord.com`,
-        `"${query}" site:telegram.me OR site:t.me`,
-        `"${query}" site:kaskus.co.id OR site:forum.detik.com OR site:ads.id`,
-        
-        // Indonesian sites
-        `"${query}" site:*.ac.id OR site:*.sch.id OR site:*.go.id`,
-        `"${query}" site:*.co.id OR site:*.or.id OR site:*.web.id`,
-        `"${query}" site:*.desa.id OR site:*.biz.id`,
-        
-        // Educational institutions
-        `"${query}" site:*.edu OR site:*.gov OR site:*.mil`,
-        `"${query}" site:academia.edu OR site:researchgate.net`,
-        `"${query}" site:semanticscholar.org OR site:arxiv.org`,
-        
-        // Business & professional
-        `"${query}" inurl:cv OR inurl:resume OR inurl:portfolio`,
-        `"${query}" inurl:about OR inurl:contact OR inurl:team`,
-        `"${query}" inurl:profile OR inurl:user OR inurl:member`,
-        `"${query}" intext:"contact" intext:"email" intext:"phone"`,
-        
-        // Design & creative
-        `"${query}" site:behance.net OR site:dribbble.com OR site:artstation.com`,
-        `"${query}" site:deviantart.com OR site:pixiv.net OR site:500px.com`,
-        `"${query}" site:flickr.com OR site:unsplash.com`,
-        
-        // E-commerce & marketplaces
-        `"${query}" site:tokopedia.com OR site:shopee.co.id OR site:bukalapak.com`,
-        `"${query}" site:olx.co.id OR site:blibli.com OR site:lazada.co.id`,
-        `"${query}" site:ebay.com OR site:amazon.com OR site:etsy.com`,
-        
-        // Messaging & communication
-        `"${query}" site:web.whatsapp.com OR intext:"whatsapp"`,
-        `"${query}" intext:"telegram" OR intext:"discord" OR intext:"slack"`,
-        `"${query}" site:skype.com OR site:zoom.us OR site:teams.microsoft.com`,
-        
-        // Security & sensitive data
-        `"${query}" intext:"password" OR intext:"credentials" OR intext:"login"`,
-        `"${query}" intext:"database" OR intext:"dump" OR intext:"leak"`,
-        `"${query}" intext:"api key" OR intext:"api_key" OR intext:"token"`,
-        `"${query}" intext:"secret" OR intext:"private" OR intext:"confidential"`,
-        `"${query}" inurl:admin OR inurl:dashboard OR inurl:panel`,
-        `"${query}" inurl:config OR inurl:backup OR inurl:db`,
-        
-        // Invoice & financial
-        `"${query}" intext:"invoice" OR intext:"payment" OR intext:"receipt"`,
-        `"${query}" intext:"bank" OR intext:"account" OR intext:"transaction"`,
-        
-        // Job & recruitment
-        `"${query}" site:indeed.com OR site:jobstreet.co.id OR site:linkedin.com/jobs`,
-        `"${query}" intext:"apply" OR intext:"career" OR intext:"recruitment"`,
-        
-        // Video & streaming
-        `"${query}" site:youtube.com OR site:vimeo.com OR site:dailymotion.com`,
-        `"${query}" site:twitch.tv OR site:livestream.com`,
-        
-        // Music & audio
-        `"${query}" site:soundcloud.com OR site:spotify.com OR site:apple.com/music`,
-        `"${query}" site:bandcamp.com OR site:audiomack.com`,
-        
-        // Dating & social
-        `"${query}" site:tinder.com OR site:bumble.com OR site:match.com`,
-        `"${query}" site:okcupid.com OR site:pof.com`,
-        
-        // Gaming platforms
-        `"${query}" site:steam.com OR site:twitch.tv OR site:epicgames.com`,
-        `"${query}" site:kaggle.com OR site:hackerrank.com OR site:leetcode.com`,
-        
-        // News & media
-        `"${query}" site:*.news OR site:*.media OR site:medium.com`,
-        `"${query}" intext:"published" OR intext:"author" OR intext:"journalist"`,
-        
-        // Archives & backups
-        `"${query}" site:archive.org OR site:archive.is OR site:archive.today`,
-        `"${query}" inurl:backup OR inurl:old OR inurl:archive`,
-        
-        // Additional sensitive searches
-        `"${query}" "curriculum vitae" OR "resume" OR "cv"`,
-        `"${query}" "phone" OR "mobile" OR "cell"`,
-        `"${query}" "address" OR "location" OR "residence"`,
-        `"${query}" intext:"employee" OR intext:"staff" OR intext:"worker"`
-    ],
+// Enhanced fetchWithRetry function with better error handling and retry logic
+async function fetchWithRetry(url, options = {}, maxRetries = 3, delay = 1000) {
+    const { timeout = 10000, ...fetchOptions } = options;
     
-    phone: [
-        // Basic searches
-        `"${query}"`,
-        `"${query}" -site:spam`,
-        
-        // Social media - comprehensive
-        `"${query}" (site:facebook.com OR site:instagram.com OR site:twitter.com)`,
-        `"${query}" (site:tiktok.com OR site:linkedin.com OR site:pinterest.com)`,
-        `"${query}" site:vk.com OR site:ok.ru OR site:myspace.com`,
-        `"${query}" site:snapchat.com OR site:telegram.me OR site:t.me`,
-        
-        // Messaging apps
-        `"${query}" site:web.whatsapp.com OR intext:"whatsapp"`,
-        `"${query}" intext:"whatsapp" OR intext:"wa" OR intext:"telegram"`,
-        `"${query}" intext:"line" OR intext:"viber" OR intext:"wechat"`,
-        `"${query}" intext:"signal" OR intext:"discord"`,
-        
-        // Indonesian e-commerce
-        `"${query}" site:tokopedia.com OR site:bukalapak.com OR site:shopee.co.id`,
-        `"${query}" site:olx.co.id OR site:blibli.com OR site:lazada.co.id`,
-        `"${query}" site:carousell.co.id OR site:jualo.com`,
-        `"${query}" site:kaskus.co.id (jual OR beli OR lapak)`,
-        
-        // International marketplaces
-        `"${query}" site:ebay.com OR site:amazon.com OR site:craigslist.org`,
-        `"${query}" site:alibaba.com OR site:aliexpress.com`,
-        
-        // Indonesian sites
-        `"${query}" site:*.ac.id OR site:*.sch.id OR site:*.go.id OR site:*.desa.id`,
-        `"${query}" site:*.co.id OR site:*.or.id OR site:*.web.id`,
-        `"${query}" intext:"indonesia" OR intext:"jakarta" OR intext:"surabaya"`,
-        
-        // Documents & files
-        `"${query}" filetype:xlsx OR filetype:csv OR filetype:pdf`,
-        `"${query}" filetype:doc OR filetype:docx OR filetype:txt`,
-        `"${query}" filetype:vcf OR filetype:vcard OR filetype:xls`,
-        `"${query}" filetype:sql OR filetype:db OR filetype:mdb`,
-        
-        // Contact information
-        `"${query}" intext:"kontak" OR intext:"telepon" OR intext:"hp"`,
-        `"${query}" intext:"nomor hp" OR intext:"no hp" OR intext:"call"`,
-        `"${query}" intext:"hubungi" OR intext:"contact" OR intext:"reach"`,
-        `"${query}" inurl:contact OR inurl:about OR inurl:profile`,
-        
-        // Caller ID services
-        `"${query}" site:getcontact.com OR site:truecaller.com OR site:sync.me`,
-        `"${query}" site:whoscall.com OR site:eyecon.com`,
-        `"${query}" site:showcaller.com OR site:unknownphone.com`,
-        
-        // LinkedIn specific
-        `"${query}" site:linkedin.com (indonesia OR jakarta OR surabaya)`,
-        `"${query}" site:linkedin.com intext:"phone" OR intext:"mobile"`,
-        
-        // Forums & communities
-        `"${query}" site:kaskus.co.id OR site:forum.detik.com OR site:ads.id`,
-        `"${query}" site:reddit.com OR site:quora.com`,
-        `"${query}" site:lowyat.net OR site:forum.kompas.com`,
-        
-        // Business directories
-        `"${query}" site:yellowpages.co.id OR site:*.co.id intext:"contact"`,
-        `"${query}" site:pagesdirectory.com OR site:hotfrog.co.id`,
-        `"${query}" intext:"direktori" OR intext:"directory"`,
-        
-        // Job portals
-        `"${query}" site:jobstreet.co.id OR site:indeed.co.id OR site:jobs.id`,
-        `"${query}" intext:"pendaftaran" OR intext:"registrasi" OR intext:"recruitment"`,
-        
-        // Educational
-        `"${query}" site:akademik OR site:mahasiswa OR site:siswa`,
-        `"${query}" intext:"universitas" OR intext:"sekolah" OR intext:"kampus"`,
-        
-        // Government & public records
-        `"${query}" site:*.go.id OR site:*.desa.id`,
-        `"${query}" intext:"data" (filetype:xlsx OR filetype:csv)`,
-        `"${query}" intext:"daftar" OR intext:"list" OR intext:"database"`,
-        
-        // Paste sites
-        `"${query}" site:pastebin.com OR site:rentry.co OR site:ghostbin.com`,
-        `"${query}" site:justpaste.it OR site:paste.ee`,
-        
-        // Real estate & property
-        `"${query}" site:rumah123.com OR site:lamudi.co.id OR site:rumah.com`,
-        `"${query}" intext:"properti" OR intext:"property" OR intext:"real estate"`,
-        
-        // Healthcare & medical
-        `"${query}" intext:"dokter" OR intext:"doctor" OR intext:"klinik"`,
-        `"${query}" site:alodokter.com OR site:halodoc.com`,
-        
-        // Transportation
-        `"${query}" intext:"driver" OR intext:"supir" OR intext:"kurir"`,
-        `"${query}" site:gojek.com OR site:grab.com`,
-        
-        // Dating apps
-        `"${query}" site:tinder.com OR site:bumble.com OR site:okcupid.com`,
-        
-        // Invoice & business
-        `"${query}" intext:"invoice" OR intext:"faktur" OR intext:"receipt"`,
-        `"${query}" intext:"supplier" OR intext:"vendor" OR intext:"customer"`,
-        
-        // Events & registration
-        `"${query}" intext:"event" OR intext:"acara" OR intext:"registration"`,
-        `"${query}" intext:"ticket" OR intext:"tiket" OR intext:"booking"`,
-        
-        // Additional context
-        `"${query}" site:*.com intext:"indonesia" intext:"phone"`,
-        `"${query}" inurl:member OR inurl:user OR inurl:account`,
-        `"${query}" intext:"member" OR intext:"anggota"`,
-        
-        // Emergency & services
-        `"${query}" intext:"emergency" OR intext:"darurat" OR intext:"helpline"`,
-        
-        // Archives
-        `"${query}" site:archive.org OR site:archive.is`,
-        
-        // Cloud storage
-        `"${query}" site:docs.google.com OR site:drive.google.com`,
-        `"${query}" site:dropbox.com OR site:onedrive.live.com`
-    ],
-    
-    username: [
-        // Basic searches
-        `"${query}"`,
-        `"${query}" -site:facebook.com`,
-        
-        // Code repositories
-        `"${query}" (site:github.com OR site:gitlab.com OR site:bitbucket.org)`,
-        `"${query}" site:sourceforge.net OR site:codepen.io OR site:jsfiddle.net`,
-        `"${query}" site:repl.it OR site:codesandbox.io OR site:glitch.com`,
-        
-        // Paste sites
-        `"${query}" site:pastebin.com OR site:ghostbin.com OR site:rentry.co`,
-        `"${query}" site:justpaste.it OR site:paste.ee OR site:hastebin.com`,
-        `"${query}" site:ideone.com OR site:codepad.org`,
-        
-        // Social media - major platforms
-        `"${query}" (site:twitter.com OR site:instagram.com OR site:tiktok.com)`,
-        `"${query}" (site:facebook.com OR site:linkedin.com OR site:pinterest.com)`,
-        `"${query}" site:snapchat.com OR site:tumblr.com`,
-        
-        // International social networks
-        `"${query}" site:vk.com OR site:ok.ru OR site:weibo.com`,
-        `"${query}" site:qq.com OR site:wechat.com`,
-        
-        // Blogging platforms
-        `"${query}" site:medium.com OR site:dev.to OR site:hashnode.com`,
-        `"${query}" site:wordpress.com OR site:blogger.com OR site:wix.com`,
-        `"${query}" site:substack.com OR site:ghost.org`,
-        
-        // Developer communities
-        `"${query}" site:stackoverflow.com OR site:stackexchange.com`,
-        `"${query}" site:hackernews.com OR site:lobste.rs`,
-        `"${query}" site:producthunt.com OR site:indiehackers.com`,
-        
-        // Forums & communities
-        `"${query}" site:reddit.com OR site:quora.com`,
-        `"${query}" site:discord.com OR site:discordapp.com OR site:discord.gg`,
-        `"${query}" site:telegram.me OR site:t.me`,
-        `"${query}" site:kaskus.co.id OR site:ads.id`,
-        
-        // Design & creative
-        `"${query}" site:behance.net OR site:dribbble.com OR site:artstation.com`,
-        `"${query}" site:deviantart.com OR site:pixiv.net OR site:500px.com`,
-        `"${query}" site:flickr.com OR site:unsplash.com OR site:pexels.com`,
-        
-        // Photography
-        `"${query}" site:instagram.com OR site:vsco.co OR site:ello.co`,
-        
-        // Video platforms
-        `"${query}" site:youtube.com OR site:vimeo.com OR site:dailymotion.com`,
-        `"${query}" site:twitch.tv OR site:mixer.com OR site:dlive.tv`,
-        `"${query}" site:rumble.com OR site:odysee.com`,
-        
-        // Gaming platforms
-        `"${query}" site:steam.com OR site:steamcommunity.com`,
-        `"${query}" site:twitch.tv OR site:discord.gg`,
-        `"${query}" site:roblox.com OR site:minecraft.net`,
-        `"${query}" site:epicgames.com OR site:battle.net`,
-        `"${query}" site:playstation.com OR site:xbox.com`,
-        
-        // Gaming profiles
-        `"${query}" site:op.gg OR site:dotabuff.com OR site:tracker.gg`,
-        `"${query}" site:lolchess.gg OR site:chess.com OR site:lichess.org`,
-        
-        // Music platforms
-        `"${query}" site:soundcloud.com OR site:spotify.com OR site:apple.com/music`,
-        `"${query}" site:bandcamp.com OR site:audiomack.com OR site:mixcloud.com`,
-        `"${query}" site:last.fm OR site:genius.com`,
-        
-        // Professional networks
-        `"${query}" site:linkedin.com OR site:xing.com OR site:indeed.com`,
-        
-        // Learning platforms
-        `"${query}" site:udemy.com OR site:coursera.org OR site:edx.org`,
-        `"${query}" site:skillshare.com OR site:pluralsight.com`,
-        `"${query}" site:codecademy.com OR site:freecodecamp.org`,
-        
-        // Competitive programming
-        `"${query}" site:kaggle.com OR site:hackerrank.com OR site:leetcode.com`,
-        `"${query}" site:codeforces.com OR site:topcoder.com OR site:codechef.com`,
-        `"${query}" site:atcoder.jp OR site:projecteuler.net`,
-        
-        // Academic & research
-        `"${query}" site:academia.edu OR site:researchgate.net`,
-        `"${query}" site:orcid.org OR site:scholar.google.com`,
-        
-        // Indonesian sites
-        `"${query}" (site:*.ac.id OR site:*.sch.id) intext:"mahasiswa"`,
-        `"${query}" site:*.co.id OR site:*.or.id`,
-        
-        // Documents & presentations
-        `"${query}" site:slideshare.net OR site:scribd.com OR site:issuu.com`,
-        `"${query}" site:prezi.com OR site:canva.com`,
-        
-        // Portfolio & showcase
-        `"${query}" intext:"portfolio" OR intext:"projects" OR intext:"work"`,
-        `"${query}" inurl:user OR inurl:profile OR inurl:member`,
-        `"${query}" inurl:portfolio OR inurl:about OR inurl:resume`,
-        
-        // Contact information
-        `"${query}" intext:"email" OR intext:"contact" OR intext:"about"`,
-        `"${query}" intext:"reach me" OR intext:"get in touch"`,
-        
-        // Messaging & chat
-        `"${query}" site:whatsapp.com OR site:telegram.org`,
-        `"${query}" site:signal.org OR site:wickr.com`,
-        
-        // Dating platforms
-        `"${query}" site:tinder.com OR site:bumble.com OR site:hinge.co`,
-        `"${query}" site:okcupid.com OR site:match.com OR site:pof.com`,
-        
-        // Freelance platforms
-        `"${query}" site:upwork.com OR site:fiverr.com OR site:freelancer.com`,
-        `"${query}" site:toptal.com OR site:guru.com OR site:peopleperhour.com`,
-        `"${query}" site:projects.co.id OR site:sribulancer.com`,
-        
-        // E-commerce profiles
-        `"${query}" site:etsy.com OR site:ebay.com OR site:amazon.com`,
-        `"${query}" site:tokopedia.com OR site:shopee.co.id OR site:bukalapak.com`,
-        
-        // Fitness & health
-        `"${query}" site:strava.com OR site:myfitnesspal.com OR site:fitbit.com`,
-        
-        // Travel
-        `"${query}" site:tripadvisor.com OR site:airbnb.com OR site:couchsurfing.com`,
-        
-        // Fashion & beauty
-        `"${query}" site:pinterest.com OR site:polyvore.com`,
-        
-        // Food & recipes
-        `"${query}" site:allrecipes.com OR site:foodnetwork.com`,
-        
-        // Book platforms
-        `"${query}" site:goodreads.com OR site:wattpad.com OR site:archive.org`,
-        
-        // Podcasts
-        `"${query}" site:anchor.fm OR site:podbean.com OR site:castbox.fm`,
-        
-        // NFT & crypto
-        `"${query}" site:opensea.io OR site:rarible.com OR site:foundation.app`,
-        `"${query}" site:coinbase.com OR site:binance.com`,
-        
-        // 3D & modeling
-        `"${query}" site:sketchfab.com OR site:cgtrader.com OR site:turbosquid.com`,
-        
-        // Animation
-        `"${query}" site:newgrounds.com OR site:animator.com`,
-        
-        // Archives
-        `"${query}" site:archive.org OR site:archive.is OR site:web.archive.org`,
-        
-        // Professional services
-        `"${query}" site:about.me OR site:linktree.com OR site:bio.link`,
-        `"${query}" site:carrd.co OR site:notion.so`,
-        
-        // Additional context searches
-        `"${query}" intext:"username" OR intext:"handle" OR intext:"alias"`,
-        `"${query}" intext:"follow me" OR intext:"find me"`,
-        `"${query}" "social media" OR "my profile"`,
-        
-        // Indonesian forums
-        `"${query}" site:kaskus.co.id OR site:forum.detik.com OR site:bersosial.com`,
-        
-        // Tech communities
-        `"${query}" site:hackernews.com OR site:slashdot.org`,
-        
-        // Security & privacy
-        `"${query}" site:keybase.io OR site:protonmail.com`,
-        
-        // Wikis
-        `"${query}" site:fandom.com OR site:wikia.com OR site:wikipedia.org`
-    ]
-};
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            
+            const response = await axios.get(url, {
+                ...fetchOptions,
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            return response;
+        } catch (error) {
+            if (i === maxRetries - 1) throw error;
+            
+            // Exponential backoff with jitter
+            const waitTime = delay * Math.pow(2, i) + Math.random() * 1000;
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            
+            console.log(`   ⚠️  Retry ${i + 1}/${maxRetries} for ${url.substring(0, 50)}...`);
+        }
+    }
+}
 
-    const queries = dorkSets[type] || dorkSets.username;
+// Random delay function to avoid rate limiting
+async function randomDelay(min = 1000, max = 3000) {
+    const delay = Math.floor(Math.random() * (max - min + 1)) + min;
+    await new Promise(resolve => setTimeout(resolve, delay));
+}
+
+// Enhanced delay function with optional randomization
+async function delay(ms, randomize = false) {
+    if (randomize) {
+        const randomizedMs = ms + Math.floor(Math.random() * ms * 0.5);
+        await new Promise(resolve => setTimeout(resolve, randomizedMs));
+    } else {
+        await new Promise(resolve => setTimeout(resolve, ms));
+    }
+}
+
+async function megaGoogleDork(query, type, options = {}) {
+    // Enhanced dork sets with more comprehensive queries
+    const dorkSets = {
+        email: [
+            // Basic searches
+            `"${query}"`,
+            `"${query}" -site:${query.split('@')[1]}`,
+            
+            // Professional networks & code repositories
+            `"${query}" (site:linkedin.com OR site:github.com OR site:gitlab.com)`,
+            `"${query}" site:bitbucket.org OR site:sourceforge.net OR site:codepen.io`,
+            `"${query}" site:stackoverflow.com OR site:stackexchange.com OR site:superuser.com`,
+            `"${query}" site:dev.to OR site:medium.com OR site:hashnode.com`,
+            
+            // Documents & files
+            `"${query}" (filetype:pdf OR filetype:xlsx OR filetype:docx OR filetype:csv)`,
+            `"${query}" (filetype:ppt OR filetype:pptx OR filetype:doc OR filetype:txt)`,
+            `"${query}" (filetype:xls OR filetype:json OR filetype:xml OR filetype:log)`,
+            `"${query}" filetype:sql OR filetype:db OR filetype:sqlite OR filetype:mdb`,
+            `"${query}" filetype:env OR filetype:config OR filetype:ini OR filetype:yml`,
+            `"${query}" filetype:bak OR filetype:backup OR filetype:old`,
+            
+            // Paste sites & text dumps
+            `"${query}" site:pastebin.com OR site:ghostbin.com OR site:rentry.co`,
+            `"${query}" site:justpaste.it OR site:paste.ee OR site:hastebin.com`,
+            `"${query}" site:controlc.com OR site:paste2.org OR site:privatebin.net`,
+            `"${query}" site:ideone.com OR site:codepad.org OR site:dpaste.com`,
+            
+            // Project management & collaboration
+            `"${query}" site:trello.com OR site:atlassian.net OR site:asana.com`,
+            `"${query}" site:notion.so OR site:monday.com OR site:clickup.com`,
+            `"${query}" site:basecamp.com OR site:airtable.com`,
+            
+            // Cloud storage & docs
+            `"${query}" site:docs.google.com OR site:drive.google.com`,
+            `"${query}" site:onedrive.live.com OR site:dropbox.com`,
+            `"${query}" site:box.com OR site:mega.nz OR site:mediafire.com`,
+            `"${query}" site:scribd.com OR site:slideshare.net OR site:issuu.com`,
+            `"${query}" site:docdroid.net OR site:docdroid.com`,
+            
+            // Social media platforms
+            `"${query}" (site:facebook.com OR site:instagram.com OR site:twitter.com)`,
+            `"${query}" (site:tiktok.com OR site:snapchat.com OR site:pinterest.com)`,
+            `"${query}" site:vk.com OR site:ok.ru OR site:myspace.com`,
+            `"${query}" site:tumblr.com OR site:blogger.com OR site:wordpress.com`,
+            
+            // Forums & communities
+            `"${query}" site:reddit.com OR site:quora.com OR site:stackexchange.com`,
+            `"${query}" site:discord.gg OR site:discordapp.com OR site:discord.com`,
+            `"${query}" site:telegram.me OR site:t.me`,
+            `"${query}" site:kaskus.co.id OR site:forum.detik.com OR site:ads.id`,
+            
+            // Indonesian sites
+            `"${query}" site:*.ac.id OR site:*.sch.id OR site:*.go.id`,
+            `"${query}" site:*.co.id OR site:*.or.id OR site:*.web.id`,
+            `"${query}" site:*.desa.id OR site:*.biz.id`,
+            
+            // Educational institutions
+            `"${query}" site:*.edu OR site:*.gov OR site:*.mil`,
+            `"${query}" site:academia.edu OR site:researchgate.net`,
+            `"${query}" site:semanticscholar.org OR site:arxiv.org`,
+            
+            // Business & professional
+            `"${query}" inurl:cv OR inurl:resume OR inurl:portfolio`,
+            `"${query}" inurl:about OR inurl:contact OR inurl:team`,
+            `"${query}" inurl:profile OR inurl:user OR inurl:member`,
+            `"${query}" intext:"contact" intext:"email" intext:"phone"`,
+            
+            // Design & creative
+            `"${query}" site:behance.net OR site:dribbble.com OR site:artstation.com`,
+            `"${query}" site:deviantart.com OR site:pixiv.net OR site:500px.com`,
+            `"${query}" site:flickr.com OR site:unsplash.com`,
+            
+            // E-commerce & marketplaces
+            `"${query}" site:tokopedia.com OR site:shopee.co.id OR site:bukalapak.com`,
+            `"${query}" site:olx.co.id OR site:blibli.com OR site:lazada.co.id`,
+            `"${query}" site:ebay.com OR site:amazon.com OR site:etsy.com`,
+            
+            // Messaging & communication
+            `"${query}" site:web.whatsapp.com OR intext:"whatsapp"`,
+            `"${query}" intext:"telegram" OR intext:"discord" OR intext:"slack"`,
+            `"${query}" site:skype.com OR site:zoom.us OR site:teams.microsoft.com`,
+            
+            // Security & sensitive data
+            `"${query}" intext:"password" OR intext:"credentials" OR intext:"login"`,
+            `"${query}" intext:"database" OR intext:"dump" OR intext:"leak"`,
+            `"${query}" intext:"api key" OR intext:"api_key" OR intext:"token"`,
+            `"${query}" intext:"secret" OR intext:"private" OR intext:"confidential"`,
+            `"${query}" inurl:admin OR inurl:dashboard OR inurl:panel`,
+            `"${query}" inurl:config OR inurl:backup OR inurl:db`,
+            
+            // Invoice & financial
+            `"${query}" intext:"invoice" OR intext:"payment" OR intext:"receipt"`,
+            `"${query}" intext:"bank" OR intext:"account" OR intext:"transaction"`,
+            
+            // Job & recruitment
+            `"${query}" site:indeed.com OR site:jobstreet.co.id OR site:linkedin.com/jobs`,
+            `"${query}" intext:"apply" OR intext:"career" OR intext:"recruitment"`,
+            
+            // Video & streaming
+            `"${query}" site:youtube.com OR site:vimeo.com OR site:dailymotion.com`,
+            `"${query}" site:twitch.tv OR site:livestream.com`,
+            
+            // Music & audio
+            `"${query}" site:soundcloud.com OR site:spotify.com OR site:apple.com/music`,
+            `"${query}" site:bandcamp.com OR site:audiomack.com`,
+            
+            // Dating & social
+            `"${query}" site:tinder.com OR site:bumble.com OR site:match.com`,
+            `"${query}" site:okcupid.com OR site:pof.com`,
+            
+            // Gaming platforms
+            `"${query}" site:steam.com OR site:twitch.tv OR site:epicgames.com`,
+            `"${query}" site:kaggle.com OR site:hackerrank.com OR site:leetcode.com`,
+            
+            // News & media
+            `"${query}" site:*.news OR site:*.media OR site:medium.com`,
+            `"${query}" intext:"published" OR intext:"author" OR intext:"journalist"`,
+            
+            // Archives & backups
+            `"${query}" site:archive.org OR site:archive.is OR site:archive.today`,
+            `"${query}" inurl:backup OR inurl:old OR inurl:archive`,
+            
+            // Additional sensitive searches
+            `"${query}" "curriculum vitae" OR "resume" OR "cv"`,
+            `"${query}" "phone" OR "mobile" OR "cell"`,
+            `"${query}" "address" OR "location" OR "residence"`,
+            `"${query}" intext:"employee" OR intext:"staff" OR intext:"worker"`,
+            
+            // New advanced queries
+            `"${query}" ext:log OR ext:txt OR ext:conf OR ext:cfg`,
+            `"${query}" ext:sql OR ext:db OR ext:sqlite OR ext:mdb`,
+            `"${query}" ext:backup OR ext:bak OR ext:old`,
+            `"${query}" inurl:admin OR inurl:administrator OR inurl:admin.php`,
+            `"${query}" inurl:login OR inurl:signin OR inurl:auth`,
+            `"${query}" intitle:"index of" OR intitle:"list of" OR intitle:"directory"`,
+            `"${query}" "internal" OR "private" OR "confidential"`,
+            `"${query}" "sensitive" OR "restricted" OR "classified"`,
+            `"${query}" "employee list" OR "staff directory" OR "contact list"`,
+            `"${query}" "customer data" OR "client information" OR "user records"`,
+            `"${query}" "personal information" OR "private data" OR "confidential records"`
+        ],
+        
+        phone: [
+            // Basic searches
+            `"${query}"`,
+            `"${query}" -site:spam`,
+            
+            // Social media - comprehensive
+            `"${query}" (site:facebook.com OR site:instagram.com OR site:twitter.com)`,
+            `"${query}" (site:tiktok.com OR site:linkedin.com OR site:pinterest.com)`,
+            `"${query}" site:vk.com OR site:ok.ru OR site:myspace.com`,
+            `"${query}" site:snapchat.com OR site:telegram.me OR site:t.me`,
+            
+            // Messaging apps
+            `"${query}" site:web.whatsapp.com OR intext:"whatsapp"`,
+            `"${query}" intext:"whatsapp" OR intext:"wa" OR intext:"telegram"`,
+            `"${query}" intext:"line" OR intext:"viber" OR intext:"wechat"`,
+            `"${query}" intext:"signal" OR intext:"discord"`,
+            
+            // Indonesian e-commerce
+            `"${query}" site:tokopedia.com OR site:bukalapak.com OR site:shopee.co.id`,
+            `"${query}" site:olx.co.id OR site:blibli.com OR site:lazada.co.id`,
+            `"${query}" site:carousell.co.id OR site:jualo.com`,
+            `"${query}" site:kaskus.co.id (jual OR beli OR lapak)`,
+            
+            // International marketplaces
+            `"${query}" site:ebay.com OR site:amazon.com OR site:craigslist.org`,
+            `"${query}" site:alibaba.com OR site:aliexpress.com`,
+            
+            // Indonesian sites
+            `"${query}" site:*.ac.id OR site:*.sch.id OR site:*.go.id OR site:*.desa.id`,
+            `"${query}" site:*.co.id OR site:*.or.id OR site:*.web.id`,
+            `"${query}" intext:"indonesia" OR intext:"jakarta" OR intext:"surabaya"`,
+            
+            // Documents & files
+            `"${query}" filetype:xlsx OR filetype:csv OR filetype:pdf`,
+            `"${query}" filetype:doc OR filetype:docx OR filetype:txt`,
+            `"${query}" filetype:vcf OR filetype:vcard OR filetype:xls`,
+            `"${query}" filetype:sql OR filetype:db OR filetype:mdb`,
+            
+            // Contact information
+            `"${query}" intext:"kontak" OR intext:"telepon" OR intext:"hp"`,
+            `"${query}" intext:"nomor hp" OR intext:"no hp" OR intext:"call"`,
+            `"${query}" intext:"hubungi" OR intext:"contact" OR intext:"reach"`,
+            `"${query}" inurl:contact OR inurl:about OR inurl:profile`,
+            
+            // Caller ID services
+            `"${query}" site:getcontact.com OR site:truecaller.com OR site:sync.me`,
+            `"${query}" site:whoscall.com OR site:eyecon.com`,
+            `"${query}" site:showcaller.com OR site:unknownphone.com`,
+            
+            // LinkedIn specific
+            `"${query}" site:linkedin.com (indonesia OR jakarta OR surabaya)`,
+            `"${query}" site:linkedin.com intext:"phone" OR intext:"mobile"`,
+            
+            // Forums & communities
+            `"${query}" site:kaskus.co.id OR site:forum.detik.com OR site:ads.id`,
+            `"${query}" site:reddit.com OR site:quora.com`,
+            `"${query}" site:lowyat.net OR site:forum.kompas.com`,
+            
+            // Business directories
+            `"${query}" site:yellowpages.co.id OR site:*.co.id intext:"contact"`,
+            `"${query}" site:pagesdirectory.com OR site:hotfrog.co.id`,
+            `"${query}" intext:"direktori" OR intext:"directory"`,
+            
+            // Job portals
+            `"${query}" site:jobstreet.co.id OR site:indeed.co.id OR site:jobs.id`,
+            `"${query}" intext:"pendaftaran" OR intext:"registrasi" OR intext:"recruitment"`,
+            
+            // Educational
+            `"${query}" site:akademik OR site:mahasiswa OR site:siswa`,
+            `"${query}" intext:"universitas" OR intext:"sekolah" OR intext:"kampus"`,
+            
+            // Government & public records
+            `"${query}" site:*.go.id OR site:*.desa.id`,
+            `"${query}" intext:"data" (filetype:xlsx OR filetype:csv)`,
+            `"${query}" intext:"daftar" OR intext:"list" OR intext:"database"`,
+            
+            // Paste sites
+            `"${query}" site:pastebin.com OR site:rentry.co OR site:ghostbin.com`,
+            `"${query}" site:justpaste.it OR site:paste.ee`,
+            
+            // Real estate & property
+            `"${query}" site:rumah123.com OR site:lamudi.co.id OR site:rumah.com`,
+            `"${query}" intext:"properti" OR intext:"property" OR intext:"real estate"`,
+            
+            // Healthcare & medical
+            `"${query}" intext:"dokter" OR intext:"doctor" OR intext:"klinik"`,
+            `"${query}" site:alodokter.com OR site:halodoc.com`,
+            
+            // Transportation
+            `"${query}" intext:"driver" OR intext:"supir" OR intext:"kurir"`,
+            `"${query}" site:gojek.com OR site:grab.com`,
+            
+            // Dating apps
+            `"${query}" site:tinder.com OR site:bumble.com OR site:okcupid.com`,
+            
+            // Invoice & business
+            `"${query}" intext:"invoice" OR intext:"faktur" OR intext:"receipt"`,
+            `"${query}" intext:"supplier" OR intext:"vendor" OR intext:"customer"`,
+            
+            // Events & registration
+            `"${query}" intext:"event" OR intext:"acara" OR intext:"registration"`,
+            `"${query}" intext:"ticket" OR intext:"tiket" OR intext:"booking"`,
+            
+            // Additional context
+            `"${query}" site:*.com intext:"indonesia" intext:"phone"`,
+            `"${query}" inurl:member OR inurl:user OR inurl:account`,
+            `"${query}" intext:"member" OR intext:"anggota"`,
+            
+            // Emergency & services
+            `"${query}" intext:"emergency" OR intext:"darurat" OR intext:"helpline"`,
+            
+            // Archives
+            `"${query}" site:archive.org OR site:archive.is`,
+            
+            // Cloud storage
+            `"${query}" site:docs.google.com OR site:drive.google.com`,
+            `"${query}" site:dropbox.com OR site:onedrive.live.com`,
+            
+            // New advanced queries
+            `"${query}" ext:vcf OR ext:vcard OR ext:contact`,
+            `"${query}" ext:log OR ext:txt OR ext:conf OR ext:cfg`,
+            `"${query}" ext:xlsx OR ext:csv OR ext:doc OR ext:docx`,
+            `"${query}" intitle:"phone book" OR intitle:"contact list" OR intitle:"directory"`,
+            `"${query}" "phone number" OR "mobile number" OR "cell number"`,
+            `"${query}" "contact details" OR "personal information" OR "private contact"`,
+            `"${query}" "call me" OR "reach me" OR "contact me at"`,
+            `"${query}" "customer service" OR "support hotline" OR "helpline"`,
+            `"${query}" "business contact" OR "office number" OR "work phone"`,
+            `"${query}" "emergency contact" OR "personal number" OR "private number"`
+        ],
+        
+        username: [
+            // Basic searches
+            `"${query}"`,
+            `"${query}" -site:facebook.com`,
+            
+            // Code repositories
+            `"${query}" (site:github.com OR site:gitlab.com OR site:bitbucket.org)`,
+            `"${query}" site:sourceforge.net OR site:codepen.io OR site:jsfiddle.net`,
+            `"${query}" site:repl.it OR site:codesandbox.io OR site:glitch.com`,
+            
+            // Paste sites
+            `"${query}" site:pastebin.com OR site:ghostbin.com OR site:rentry.co`,
+            `"${query}" site:justpaste.it OR site:paste.ee OR site:hastebin.com`,
+            `"${query}" site:ideone.com OR site:codepad.org`,
+            
+            // Social media - major platforms
+            `"${query}" (site:twitter.com OR site:instagram.com OR site:tiktok.com)`,
+            `"${query}" (site:facebook.com OR site:linkedin.com OR site:pinterest.com)`,
+            `"${query}" site:snapchat.com OR site:tumblr.com`,
+            
+            // International social networks
+            `"${query}" site:vk.com OR site:ok.ru OR site:weibo.com`,
+            `"${query}" site:qq.com OR site:wechat.com`,
+            
+            // Blogging platforms
+            `"${query}" site:medium.com OR site:dev.to OR site:hashnode.com`,
+            `"${query}" site:wordpress.com OR site:blogger.com OR site:wix.com`,
+            `"${query}" site:substack.com OR site:ghost.org`,
+            
+            // Developer communities
+            `"${query}" site:stackoverflow.com OR site:stackexchange.com`,
+            `"${query}" site:hackernews.com OR site:lobste.rs`,
+            `"${query}" site:producthunt.com OR site:indiehackers.com`,
+            
+            // Forums & communities
+            `"${query}" site:reddit.com OR site:quora.com`,
+            `"${query}" site:discord.com OR site:discordapp.com OR site:discord.gg`,
+            `"${query}" site:telegram.me OR site:t.me`,
+            `"${query}" site:kaskus.co.id OR site:ads.id`,
+            
+            // Design & creative
+            `"${query}" site:behance.net OR site:dribbble.com OR site:artstation.com`,
+            `"${query}" site:deviantart.com OR site:pixiv.net OR site:500px.com`,
+            `"${query}" site:flickr.com OR site:unsplash.com OR site:pexels.com`,
+            
+            // Photography
+            `"${query}" site:instagram.com OR site:vsco.co OR site:ello.co`,
+            
+            // Video platforms
+            `"${query}" site:youtube.com OR site:vimeo.com OR site:dailymotion.com`,
+            `"${query}" site:twitch.tv OR site:mixer.com OR site:dlive.tv`,
+            `"${query}" site:rumble.com OR site:odysee.com`,
+            
+            // Gaming platforms
+            `"${query}" site:steam.com OR site:steamcommunity.com`,
+            `"${query}" site:twitch.tv OR site:discord.gg`,
+            `"${query}" site:roblox.com OR site:minecraft.net`,
+            `"${query}" site:epicgames.com OR site:battle.net`,
+            `"${query}" site:playstation.com OR site:xbox.com`,
+            
+            // Gaming profiles
+            `"${query}" site:op.gg OR site:dotabuff.com OR site:tracker.gg`,
+            `"${query}" site:lolchess.gg OR site:chess.com OR site:lichess.org`,
+            
+            // Music platforms
+            `"${query}" site:soundcloud.com OR site:spotify.com OR site:apple.com/music`,
+            `"${query}" site:bandcamp.com OR site:audiomack.com OR site:mixcloud.com`,
+            `"${query}" site:last.fm OR site:genius.com`,
+            
+            // Professional networks
+            `"${query}" site:linkedin.com OR site:xing.com OR site:indeed.com`,
+            
+            // Learning platforms
+            `"${query}" site:udemy.com OR site:coursera.org OR site:edx.org`,
+            `"${query}" site:skillshare.com OR site:pluralsight.com`,
+            `"${query}" site:codecademy.com OR site:freecodecamp.org`,
+            
+            // Competitive programming
+            `"${query}" site:kaggle.com OR site:hackerrank.com OR site:leetcode.com`,
+            `"${query}" site:codeforces.com OR site:topcoder.com OR site:codechef.com`,
+            `"${query}" site:atcoder.jp OR site:projecteuler.net`,
+            
+            // Academic & research
+            `"${query}" site:academia.edu OR site:researchgate.net`,
+            `"${query}" site:orcid.org OR site:scholar.google.com`,
+            
+            // Indonesian sites
+            `"${query}" (site:*.ac.id OR site:*.sch.id) intext:"mahasiswa"`,
+            `"${query}" site:*.co.id OR site:*.or.id`,
+            
+            // Documents & presentations
+            `"${query}" site:slideshare.net OR site:scribd.com OR site:issuu.com`,
+            `"${query}" site:prezi.com OR site:canva.com`,
+            
+            // Portfolio & showcase
+            `"${query}" intext:"portfolio" OR intext:"projects" OR intext:"work"`,
+            `"${query}" inurl:user OR inurl:profile OR inurl:member`,
+            `"${query}" inurl:portfolio OR inurl:about OR inurl:resume`,
+            
+            // Contact information
+            `"${query}" intext:"email" OR intext:"contact" OR intext:"about"`,
+            `"${query}" intext:"reach me" OR intext:"get in touch"`,
+            
+            // Messaging & chat
+            `"${query}" site:whatsapp.com OR site:telegram.org`,
+            `"${query}" site:signal.org OR site:wickr.com`,
+            
+            // Dating platforms
+            `"${query}" site:tinder.com OR site:bumble.com OR site:hinge.co`,
+            `"${query}" site:okcupid.com OR site:match.com OR site:pof.com`,
+            
+            // Freelance platforms
+            `"${query}" site:upwork.com OR site:fiverr.com OR site:freelancer.com`,
+            `"${query}" site:toptal.com OR site:guru.com OR site:peopleperhour.com`,
+            `"${query}" site:projects.co.id OR site:sribulancer.com`,
+            
+            // E-commerce profiles
+            `"${query}" site:etsy.com OR site:ebay.com OR site:amazon.com`,
+            `"${query}" site:tokopedia.com OR site:shopee.co.id OR site:bukalapak.com`,
+            
+            // Fitness & health
+            `"${query}" site:strava.com OR site:myfitnesspal.com OR site:fitbit.com`,
+            
+            // Travel
+            `"${query}" site:tripadvisor.com OR site:airbnb.com OR site:couchsurfing.com`,
+            
+            // Fashion & beauty
+            `"${query}" site:pinterest.com OR site:polyvore.com`,
+            
+            // Food & recipes
+            `"${query}" site:allrecipes.com OR site:foodnetwork.com`,
+            
+            // Book platforms
+            `"${query}" site:goodreads.com OR site:wattpad.com OR site:archive.org`,
+            
+            // Podcasts
+            `"${query}" site:anchor.fm OR site:podbean.com OR site:castbox.fm`,
+            
+            // NFT & crypto
+            `"${query}" site:opensea.io OR site:rarible.com OR site:foundation.app`,
+            `"${query}" site:coinbase.com OR site:binance.com`,
+            
+            // 3D & modeling
+            `"${query}" site:sketchfab.com OR site:cgtrader.com OR site:turbosquid.com`,
+            
+            // Animation
+            `"${query}" site:newgrounds.com OR site:animator.com`,
+            
+            // Archives
+            `"${query}" site:archive.org OR site:archive.is OR site:web.archive.org`,
+            
+            // Professional services
+            `"${query}" site:about.me OR site:linktree.com OR site:bio.link`,
+            `"${query}" site:carrd.co OR site:notion.so`,
+            
+            // Additional context searches
+            `"${query}" intext:"username" OR intext:"handle" OR intext:"alias"`,
+            `"${query}" intext:"follow me" OR intext:"find me"`,
+            `"${query}" "social media" OR "my profile"`,
+            
+            // Indonesian forums
+            `"${query}" site:kaskus.co.id OR site:forum.detik.com OR site:bersosial.com`,
+            
+            // Tech communities
+            `"${query}" site:hackernews.com OR site:slashdot.org`,
+            
+            // Security & privacy
+            `"${query}" site:keybase.io OR site:protonmail.com`,
+            
+            // Wikis
+            `"${query}" site:fandom.com OR site:wikia.com OR site:wikipedia.org`,
+            
+            // New advanced queries
+            `"${query}" "profile" OR "account" OR "user"`,
+            `"${query}" "about me" OR "contact me" OR "my bio"`,
+            `"${query}" "my website" OR "personal site" OR "portfolio"`,
+            `"${query}" "social links" OR "find me on" OR "follow me on"`,
+            `"${query}" "my work" OR "my projects" OR "my creations"`,
+            `"${query}" "github.com" OR "linkedin.com/in" OR "twitter.com"`,
+            `"${query}" "instagram.com" OR "facebook.com" OR "tiktok.com"`,
+            `"${query}" "youtube.com/c" OR "soundcloud.com" OR "twitch.tv"`,
+            `"${query}" "dev.to" OR "medium.com" OR "behance.net"`,
+            `"${query}" "dribbble.com" OR "artstation.com" OR "codepen.io"`
+        ]
+    };
+
+    // Enhanced options with defaults
+    const {
+        maxResults = 100,
+        includeArchives = true,
+        includeSocial = true,
+        includeDocuments = true,
+        includeCode = true,
+        includeForums = true,
+        customQueries = [],
+        excludeDomains = [],
+        excludeQueries = [],
+        searchDepth = 'medium', // 'shallow', 'medium', 'deep'
+        resultRelevanceThreshold = 0.3
+    } = options;
+
+    // Get the appropriate query set
+    let queries = dorkSets[type] || dorkSets.username;
+    
+    // Filter queries based on options
+    if (!includeArchives) {
+        queries = queries.filter(q => !q.includes('archive.org') && !q.includes('archive.is'));
+    }
+    
+    if (!includeSocial) {
+        queries = queries.filter(q => 
+            !q.includes('facebook.com') && 
+            !q.includes('twitter.com') && 
+            !q.includes('instagram.com') &&
+            !q.includes('linkedin.com') &&
+            !q.includes('tiktok.com')
+        );
+    }
+    
+    if (!includeDocuments) {
+        queries = queries.filter(q => !q.includes('filetype:'));
+    }
+    
+    if (!includeCode) {
+        queries = queries.filter(q => 
+            !q.includes('github.com') && 
+            !q.includes('gitlab.com') && 
+            !q.includes('bitbucket.org')
+        );
+    }
+    
+    if (!includeForums) {
+        queries = queries.filter(q => 
+            !q.includes('reddit.com') && 
+            !q.includes('quora.com') && 
+            !q.includes('stackexchange.com')
+        );
+    }
+    
+    // Add custom queries
+    if (customQueries.length > 0) {
+        queries = [...queries, ...customQueries];
+    }
+    
+    // Remove excluded queries
+    if (excludeQueries.length > 0) {
+        queries = queries.filter(q => 
+            !excludeQueries.some(exclude => q.includes(exclude))
+        );
+    }
+    
+    // Adjust search depth
+    let queryLimit = queries.length;
+    if (searchDepth === 'shallow') {
+        queryLimit = Math.min(20, queries.length);
+    } else if (searchDepth === 'medium') {
+        queryLimit = Math.min(50, queries.length);
+    }
+    
+    // Limit the number of queries
+    queries = queries.slice(0, queryLimit);
+    
     const allResults = [];
     let successCount = 0;
+    let rateLimitCount = 0;
 
     console.log(`   🔎 Executing ${queries.length} advanced dork queries...`);
 
-    for (let i = 0; i < queries.length; i++) {
-        try {
-            const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(queries[i])}&num=30&hl=en&gl=us`;
-            
-            const response = await fetchWithRetry(searchUrl, {
-                headers: {
-                    'Accept-Language': 'en-US,en;q=0.9',
-                    'Cache-Control': 'no-cache',
-                    'Referer': 'https://www.google.com/'
+    // Process queries in batches to avoid rate limiting
+    const batchSize = 5;
+    for (let i = 0; i < queries.length; i += batchSize) {
+        const batch = queries.slice(i, i + batchSize);
+        
+        for (const dorkQuery of batch) {
+            try {
+                // Add random delay between requests
+                if (i > 0) {
+                    await randomDelay(1000, 3000);
                 }
-            });
-
-            if (response.status === 200) {
-                const $ = cheerio.load(response.data);
-                let found = 0;
-
-                $('.g, .tF2Cxc').each((idx, elem) => {
-                    const title = $(elem).find('h3').text().trim();
-                    const link = $(elem).find('a').first().attr('href');
-                    const snippet = $(elem).find('.VwiC3b, .yXK7lf, .IsZvec, .aCOpRe').text().trim();
-
-                    if (link && title && !link.includes('google.com') && !link.startsWith('/search')) {
-                        const relevanceScore = calculateRelevance(snippet, query);
-                        
-                        allResults.push({
-                            title: title.substring(0, 150),
-                            url: link,
-                            snippet: snippet.substring(0, 300) || 'No description available',
-                            dorkQuery: queries[i],
-                            relevance: relevanceScore >= 0.7 ? 'HIGH' : relevanceScore >= 0.4 ? 'MEDIUM' : 'LOW',
-                            relevanceScore: relevanceScore
-                        });
-                        found++;
-                    }
+                
+                const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(dorkQuery)}&num=30&hl=en&gl=us`;
+                
+                const response = await fetchWithRetry(searchUrl, {
+                    headers: {
+                        'Accept-Language': 'en-US,en;q=0.9',
+                        'Cache-Control': 'no-cache',
+                        'Referer': 'https://www.google.com/',
+                        'User-Agent': getRandomUserAgent()
+                    },
+                    timeout: 10000
                 });
 
-                successCount++;
-                console.log(`   ✓ Query ${i + 1}/${queries.length}: ${found} results (${response.status})`);
-            } else if (response.status === 429) {
-                console.log(`   ⚠️  Query ${i + 1}/${queries.length}: Rate limited, waiting...`);
-                await delay(30000);
-            } else {
-                console.log(`   ✗ Query ${i + 1}/${queries.length}: Status ${response.status}`);
-            }
+                if (response.status === 200) {
+                    const $ = cheerio.load(response.data);
+                    let found = 0;
 
-        } catch (error) {
-            console.log(`   ✗ Query ${i + 1}/${queries.length}: ${error.message}`);
+                    $('.g, .tF2Cxc').each((idx, elem) => {
+                        const title = $(elem).find('h3').text().trim();
+                        const link = $(elem).find('a').first().attr('href');
+                        const snippet = $(elem).find('.VwiC3b, .yXK7lf, .IsZvec, .aCOpRe').text().trim();
+
+                        if (link && title && !link.includes('google.com') && !link.startsWith('/search')) {
+                            // Check if domain is in exclude list
+                            const domain = new URL(link).hostname;
+                            if (excludeDomains.some(exclude => domain.includes(exclude))) {
+                                return;
+                            }
+                            
+                            const relevanceScore = calculateRelevance(snippet, query);
+                            
+                            // Only include results above relevance threshold
+                            if (relevanceScore >= resultRelevanceThreshold) {
+                                allResults.push({
+                                    title: title.substring(0, 150),
+                                    url: link,
+                                    snippet: snippet.substring(0, 300) || 'No description available',
+                                    dorkQuery: dorkQuery,
+                                    relevance: relevanceScore >= 0.7 ? 'HIGH' : relevanceScore >= 0.4 ? 'MEDIUM' : 'LOW',
+                                    relevanceScore: relevanceScore,
+                                    source: 'Google',
+                                    queryType: type
+                                });
+                                found++;
+                            }
+                        }
+                    });
+
+                    successCount++;
+                    console.log(`   ✓ Query ${i + 1}/${queries.length}: ${found} results (${response.status})`);
+                } else if (response.status === 429) {
+                    rateLimitCount++;
+                    console.log(`   ⚠️  Query ${i + 1}/${queries.length}: Rate limited, waiting...`);
+                    
+                    // Exponential backoff for rate limiting
+                    const waitTime = Math.min(30000 * Math.pow(2, rateLimitCount - 1), 120000);
+                    await delay(waitTime);
+                    
+                    // Skip to next query if we've been rate limited too many times
+                    if (rateLimitCount > 3) {
+                        console.log(`   ⚠️  Too many rate limits, reducing query frequency...`);
+                        await delay(60000);
+                        rateLimitCount = 0;
+                    }
+                } else {
+                    console.log(`   ✗ Query ${i + 1}/${queries.length}: Status ${response.status}`);
+                }
+
+            } catch (error) {
+                console.log(`   ✗ Query ${i + 1}/${queries.length}: ${error.message}`);
+            }
+        }
+        
+        // Add a longer delay between batches
+        if (i + batchSize < queries.length) {
+            await delay(5000, true);
         }
     }
 
@@ -19367,9 +19565,14 @@ async function megaGoogleDork(query, type) {
 
     // Remove duplicates and sort by relevance
     const uniqueResults = Array.from(new Map(allResults.map(r => [r.url, r])).values());
-    return uniqueResults.sort((a, b) => b.relevanceScore - a.relevanceScore);
+    
+    // Limit the number of results
+    const limitedResults = uniqueResults.slice(0, maxResults);
+    
+    return limitedResults.sort((a, b) => b.relevanceScore - a.relevanceScore);
 }
 
+// Enhanced relevance calculation with more sophisticated scoring
 function calculateRelevance(text, query) {
     if (!text) return 0;
     
@@ -19378,40 +19581,106 @@ function calculateRelevance(text, query) {
     
     let score = 0;
     
-    // Exact match
-    if (lowerText.includes(lowerQuery)) score += 0.5;
+    // Exact match bonus
+    if (lowerText.includes(lowerQuery)) {
+        score += 0.5;
+        
+        // Bonus for exact match at the beginning of text
+        if (lowerText.startsWith(lowerQuery)) {
+            score += 0.2;
+        }
+    }
     
-    // Word proximity
-    const words = lowerQuery.split(/\s+/);
-    const matchedWords = words.filter(word => lowerText.includes(word));
-    score += (matchedWords.length / words.length) * 0.3;
+    // Word proximity and order
+    const queryWords = lowerQuery.split(/\s+/);
+    const textWords = lowerText.split(/\s+/);
+    
+    // Check for all query words appearing in the text
+    const matchedWords = queryWords.filter(word => 
+        textWords.some(textWord => textWord.includes(word) || word.includes(textWord))
+    );
+    
+    if (matchedWords.length > 0) {
+        score += (matchedWords.length / queryWords.length) * 0.3;
+        
+        // Bonus for words appearing in the same order
+        let orderBonus = 0;
+        for (let i = 0; i < queryWords.length - 1; i++) {
+            const currentWord = queryWords[i];
+            const nextWord = queryWords[i + 1];
+            
+            const currentIndex = textWords.findIndex(w => w.includes(currentWord) || currentWord.includes(w));
+            const nextIndex = textWords.findIndex(w => w.includes(nextWord) || nextWord.includes(w));
+            
+            if (currentIndex !== -1 && nextIndex !== -1 && currentIndex < nextIndex) {
+                orderBonus += 0.05;
+            }
+        }
+        score += Math.min(orderBonus, 0.2);
+    }
     
     // Context keywords
-    const contextKeywords = ['email', 'phone', 'contact', 'profile', 'about', 'user', 'account', 'member'];
+    const contextKeywords = [
+        'email', 'phone', 'contact', 'profile', 'about', 'user', 'account', 'member',
+        'name', 'person', 'individual', 'information', 'details', 'data', 'record',
+        'directory', 'list', 'index', 'search', 'find', 'locate', 'identify'
+    ];
+    
     const contextMatches = contextKeywords.filter(kw => lowerText.includes(kw));
     score += (contextMatches.length / contextKeywords.length) * 0.2;
+    
+    // Bonus for shorter snippets (more likely to be relevant)
+    const snippetLength = text.length;
+    if (snippetLength < 100) {
+        score += 0.1;
+    } else if (snippetLength < 200) {
+        score += 0.05;
+    }
+    
+    // Bonus for proper nouns (capitalized words)
+    const properNouns = text.match(/\b[A-Z][a-z]+\b/g) || [];
+    if (properNouns.length > 0) {
+        score += Math.min(properNouns.length * 0.02, 0.1);
+    }
     
     return Math.min(score, 1);
 }
 
+// Random user agent generator to avoid detection
+function getRandomUserAgent() {
+    const userAgents = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15',
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    ];
+    
+    return userAgents[Math.floor(Math.random() * userAgents.length)];
+}
+
 // ==================== DATA LEAK DATABASES ====================
 
-async function searchPastebinDumps(query) {
+async function searchPastebinDumps(query, options = {}) {
+    const { maxResults = 15 } = options;
     const results = [];
     
     try {
         console.log('   🔍 Searching Pastebin dumps...');
-        const response = await fetchWithRetry(`https://psbdmp.ws/api/search/${encodeURIComponent(query)}`);
+        const response = await fetchWithRetry(`https://psbdmp.ws/api/search/${encodeURIComponent(query)}`, {
+            timeout: 10000
+        });
         
         if (response.status === 200 && Array.isArray(response.data)) {
-            response.data.slice(0, 15).forEach(item => {
+            response.data.slice(0, maxResults).forEach(item => {
                 results.push({
                     source: 'Pastebin Dump',
                     title: item.title || 'Untitled',
                     url: `https://pastebin.com/${item.id}`,
                     id: item.id,
                     timestamp: item.time,
-                    tags: item.tags
+                    tags: item.tags,
+                    relevance: calculateRelevance(item.title + ' ' + (item.tags || ''), query)
                 });
             });
         }
@@ -19422,19 +19691,22 @@ async function searchPastebinDumps(query) {
     return results;
 }
 
-async function searchGitHubCode(query) {
+async function searchGitHubCode(query, options = {}) {
+    const { maxResults = 20, includePrivate = false } = options;
     const results = [];
     
     try {
         console.log('   🔍 Searching GitHub code...');
-        const response = await fetchWithRetry(`https://api.github.com/search/code?q=${encodeURIComponent(query)}&per_page=30`, {
+        const response = await fetchWithRetry(`https://api.github.com/search/code?q=${encodeURIComponent(query)}&per_page=${maxResults}`, {
             headers: {
-                'Accept': 'application/vnd.github.v3+json'
-            }
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': getRandomUserAgent()
+            },
+            timeout: 15000
         });
 
         if (response.status === 200 && response.data.items) {
-            response.data.items.slice(0, 20).forEach(item => {
+            response.data.items.slice(0, maxResults).forEach(item => {
                 results.push({
                     source: 'GitHub Code',
                     file: item.name,
@@ -19442,7 +19714,9 @@ async function searchGitHubCode(query) {
                     url: item.html_url,
                     repository: item.repository.full_name,
                     repoUrl: item.repository.html_url,
-                    description: item.repository.description
+                    description: item.repository.description,
+                    language: item.language,
+                    relevance: calculateRelevance(item.name + ' ' + (item.path || ''), query)
                 });
             });
         }
@@ -19453,12 +19727,19 @@ async function searchGitHubCode(query) {
     return results;
 }
 
-async function searchGitHubGists(query) {
+async function searchGitHubGists(query, options = {}) {
+    const { maxResults = 20 } = options;
     const results = [];
     
     try {
         console.log('   🔍 Searching GitHub Gists...');
-        const response = await fetchWithRetry(`https://api.github.com/search/code?q=${encodeURIComponent(query)}+in:file+language:text&per_page=20`);
+        const response = await fetchWithRetry(`https://api.github.com/search/code?q=${encodeURIComponent(query)}+in:file+language:text&per_page=${maxResults}`, {
+            headers: {
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': getRandomUserAgent()
+            },
+            timeout: 15000
+        });
 
         if (response.status === 200 && response.data.items) {
             response.data.items.forEach(item => {
@@ -19467,32 +19748,39 @@ async function searchGitHubGists(query) {
                         source: 'GitHub Gist',
                         file: item.name,
                         url: item.html_url,
-                        owner: item.repository.owner.login
+                        owner: item.repository.owner.login,
+                        relevance: calculateRelevance(item.name, query)
                     });
                 }
             });
         }
-    } catch (e) {}
+    } catch (e) {
+        console.log(`   ⚠️  GitHub Gist search failed: ${e.message}`);
+    }
 
     return results;
 }
 
-async function searchWaybackMachine(domain) {
+async function searchWaybackMachine(domain, options = {}) {
+    const { maxResults = 25, filterStatus = '200' } = options;
     const results = [];
     
     try {
         console.log('   🔍 Checking Wayback Machine archives...');
-        const response = await fetchWithRetry(`https://web.archive.org/cdx/search/cdx?url=${domain}&output=json&limit=50&filter=statuscode:200`);
+        const response = await fetchWithRetry(`https://web.archive.org/cdx/search/cdx?url=${domain}&output=json&limit=${maxResults}&filter=statuscode:${filterStatus}`, {
+            timeout: 15000
+        });
 
         if (Array.isArray(response.data) && response.data.length > 1) {
-            response.data.slice(1, 26).forEach(item => {
+            response.data.slice(1, maxResults + 1).forEach(item => {
                 results.push({
                     source: 'Archive.org',
                     timestamp: item[1],
                     originalUrl: item[2],
                     archiveUrl: `https://web.archive.org/web/${item[1]}/${item[2]}`,
                     statusCode: item[4],
-                    mimeType: item[3]
+                    mimeType: item[3],
+                    relevance: 1.0 // All results from Wayback are considered relevant
                 });
             });
         }
@@ -19503,247 +19791,295 @@ async function searchWaybackMachine(domain) {
     return results;
 }
 
-async function searchTrello(query) {
+async function searchTrello(query, options = {}) {
+    const { maxResults = 10 } = options;
     const results = [];
     
     try {
         console.log('   🔍 Searching Trello boards...');
-        const searchUrl = `https://www.google.com/search?q=site:trello.com+"${encodeURIComponent(query)}"&num=20`;
-        const response = await fetchWithRetry(searchUrl);
+        const searchUrl = `https://www.google.com/search?q=site:trello.com+"${encodeURIComponent(query)}"&num=${maxResults * 2}`;
+        const response = await fetchWithRetry(searchUrl, {
+            headers: {
+                'User-Agent': getRandomUserAgent()
+            },
+            timeout: 10000
+        });
 
         const $ = cheerio.load(response.data);
         $('.g a').each((i, elem) => {
+            if (i >= maxResults) return false;
+            
             const href = $(elem).attr('href');
             if (href && href.includes('trello.com/b/') && !href.includes('google.com')) {
                 const cleanUrl = href.split('&')[0];
                 results.push({
                     source: 'Trello Board',
                     url: cleanUrl,
-                    title: $(elem).find('h3').text()
+                    title: $(elem).find('h3').text(),
+                    relevance: calculateRelevance($(elem).text(), query)
                 });
             }
         });
-    } catch (e) {}
-
-    return results.slice(0, 10);
-}
-
-async function searchPeopleDataEngines(query, type) {
-    const results = [];
-    
-    const engines = [
-        { name: 'Whitepages', url: `https://www.whitepages.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'ThatsThem', url: `https://thatsthem.com/email/${encodeURIComponent(query)}` },
-        { name: 'Spokeo', url: `https://www.spokeo.com/${encodeURIComponent(query)}` },
-        { name: 'BeenVerified', url: `https://www.beenverified.com/search/email/${encodeURIComponent(query)}` },
-        { name: 'PeekYou', url: `https://www.peekyou.com/${encodeURIComponent(query)}` },
-        { name: 'Pipl', url: `https://pipl.com/search/?q=${encodeURIComponent(query)}` },
-        { name: 'ZabaSearch', url: `https://www.zabasearch.com/people/${encodeURIComponent(query)}` },
-        { name: 'AnyWho', url: `https://www.anywho.com/people/${encodeURIComponent(query)}` },
-        { name: 'PeopleFinders', url: `https://www.peoplefinders.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Intelius', url: `https://www.intelius.com/people-search/${encodeURIComponent(query)}` },
-        { name: 'TruthFinder', url: `https://www.truthfinder.com/results/?firstName=${encodeURIComponent(query)}` },
-        { name: 'InstantCheckmate', url: `https://www.instantcheckmate.com/search/?firstName=${encodeURIComponent(query)}` },
-        { name: 'USSearch', url: `https://www.ussearch.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Radaris', url: `https://radaris.com/p/${encodeURIComponent(query)}` },
-        { name: 'Melissa', url: `https://www.melissa.com/lookups/emails?email=${encodeURIComponent(query)}` },
-        { name: 'EmailHippo', url: `https://tools.emailhippo.com/${encodeURIComponent(query)}` },
-        { name: 'Hunter.io', url: `https://hunter.io/search/${encodeURIComponent(query)}` },
-        { name: 'Voila Norbert', url: `https://www.voilanorbert.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'RocketReach', url: `https://rocketreach.co/search?query=${encodeURIComponent(query)}` },
-        { name: 'ContactOut', url: `https://contactout.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Lusha', url: `https://www.lusha.com/search/?query=${encodeURIComponent(query)}` },
-        { name: 'Clearbit', url: `https://clearbit.com/resources/tools/connect?email=${encodeURIComponent(query)}` },
-        { name: 'EmailRep', url: `https://emailrep.io/${encodeURIComponent(query)}` },
-        { name: 'Verifalia', url: `https://verifalia.com/validate-email/${encodeURIComponent(query)}` },
-        { name: 'EmailChecker', url: `https://email-checker.net/check?email=${encodeURIComponent(query)}` },
-        { name: 'VerifyEmailAddress', url: `https://www.verifyemailaddress.org/${encodeURIComponent(query)}` },
-        { name: 'TheChecker', url: `https://thechecker.co/verify-email/${encodeURIComponent(query)}` },
-        { name: 'MyEmailVerifier', url: `https://www.myemailverifier.com/verify-email/${encodeURIComponent(query)}` },
-        { name: 'MailTester', url: `https://www.mail-tester.com/web-${encodeURIComponent(query)}` },
-        { name: 'EmailFinder', url: `https://emailfinder.io/search/${encodeURIComponent(query)}` },
-        { name: 'FindThatEmail', url: `https://findthat.email/search/${encodeURIComponent(query)}` },
-        { name: 'FindEmails', url: `https://www.findemails.com/search/${encodeURIComponent(query)}` },
-        { name: 'Snov.io', url: `https://snov.io/email-finder?query=${encodeURIComponent(query)}` },
-        { name: 'LeadIQ', url: `https://leadiq.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'SignalHire', url: `https://www.signalhire.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'GetProspect', url: `https://getprospect.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'Kaspr', url: `https://www.kaspr.io/tools/email-finder?query=${encodeURIComponent(query)}` },
-        { name: 'DropContact', url: `https://www.dropcontact.com/enrichment?email=${encodeURIComponent(query)}` },
-        { name: 'Seamless.ai', url: `https://www.seamless.ai/search?q=${encodeURIComponent(query)}` },
-        { name: 'AeroLeads', url: `https://aeroleads.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'LeadGibbon', url: `https://leadgibbon.com/search/${encodeURIComponent(query)}` },
-        { name: 'GetEmail.io', url: `https://getemail.io/search?email=${encodeURIComponent(query)}` },
-        { name: 'EmailBreaker', url: `https://www.email-breaker.com/search/${encodeURIComponent(query)}` },
-        { name: 'That\'sThem Email', url: `https://thatsthem.com/reverse-email-lookup/${encodeURIComponent(query)}` },
-        { name: 'EmailSearch.net', url: `https://www.emailsearch.net/search?email=${encodeURIComponent(query)}` },
-        { name: 'ReverseContact', url: `https://www.reversecontact.com/lookup?email=${encodeURIComponent(query)}` },
-        { name: 'Personio', url: `https://www.personio.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'VoilaNorbert Email', url: `https://www.voilanorbert.com/verify-email?email=${encodeURIComponent(query)}` },
-        { name: 'EmailSearch.io', url: `https://emailsearch.io/search?query=${encodeURIComponent(query)}` },
-        { name: 'FindAnyEmail', url: `https://findanyemail.net/search?q=${encodeURIComponent(query)}` },
-        { name: 'EmailHunter', url: `https://emailhunter.co/search/${encodeURIComponent(query)}` },
-        { name: 'BetterContact', url: `https://bettercontact.com/search?email=${encodeURIComponent(query)}` },
-        { name: 'Adapt.io', url: `https://adapt.io/search?q=${encodeURIComponent(query)}` },
-        { name: 'LeadFuze', url: `https://www.leadfuze.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'UpLead', url: `https://www.uplead.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Cognism', url: `https://www.cognism.com/search/${encodeURIComponent(query)}` },
-        { name: 'ZoomInfo', url: `https://www.zoominfo.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'LeadGenius', url: `https://leadgenius.com/search?email=${encodeURIComponent(query)}` },
-        { name: 'Datanyze', url: `https://www.datanyze.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'DiscoverOrg', url: `https://discoverorg.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'InsideView', url: `https://www.insideview.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'LeadSpace', url: `https://www.leadspace.com/search/${encodeURIComponent(query)}` },
-        { name: 'EasyLeadz', url: `https://easyleadz.com/search?email=${encodeURIComponent(query)}` },
-        { name: 'Leadiro', url: `https://www.leadiro.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Lead411', url: `https://www.lead411.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'LeadsPlease', url: `https://www.leadsplease.com/search/${encodeURIComponent(query)}` },
-        { name: 'SalesIntel', url: `https://salesintel.io/search?q=${encodeURIComponent(query)}` },
-        { name: 'Oceanos', url: `https://oceanos.io/search?email=${encodeURIComponent(query)}` },
-        { name: 'LeadMine', url: `https://leadmine.net/search?query=${encodeURIComponent(query)}` },
-        { name: 'FindThatLead', url: `https://findthatlead.com/search/${encodeURIComponent(query)}` },
-        { name: 'Skrapp.io', url: `https://www.skrapp.io/search?q=${encodeURIComponent(query)}` },
-        { name: 'Prospect.io', url: `https://prospect.io/search?email=${encodeURIComponent(query)}` },
-        { name: 'Reply.io', url: `https://reply.io/email-finder/?query=${encodeURIComponent(query)}` },
-        { name: 'Salesloft', url: `https://salesloft.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Outreach.io', url: `https://www.outreach.io/search/${encodeURIComponent(query)}` },
-        { name: 'Mixmax', url: `https://www.mixmax.com/search?email=${encodeURIComponent(query)}` },
-        { name: 'Yesware', url: `https://www.yesware.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Cirrus Insight', url: `https://www.cirrusinsight.com/search/${encodeURIComponent(query)}` },
-        { name: 'Groove', url: `https://www.groove.co/search?query=${encodeURIComponent(query)}` },
-        { name: 'Close.com', url: `https://close.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Pipedrive', url: `https://www.pipedrive.com/search/${encodeURIComponent(query)}` },
-        { name: 'HubSpot Search', url: `https://www.hubspot.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'Zoho CRM', url: `https://crm.zoho.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Freshsales', url: `https://www.freshworks.com/crm/search/${encodeURIComponent(query)}` },
-        { name: 'Nimble', url: `https://www.nimble.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'Salesforce Search', url: `https://www.salesforce.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Monday Sales', url: `https://monday.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Capsule CRM', url: `https://capsulecrm.com/search/${encodeURIComponent(query)}` },
-        { name: 'Insightly', url: `https://www.insightly.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'Streak', url: `https://www.streak.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Copper', url: `https://www.copper.com/search/${encodeURIComponent(query)}` },
-        { name: 'Nutshell', url: `https://www.nutshell.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'Agile CRM', url: `https://www.agilecrm.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Keap', url: `https://keap.com/search/${encodeURIComponent(query)}` },
-        { name: 'ActiveCampaign', url: `https://www.activecampaign.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'Mailchimp Search', url: `https://mailchimp.com/search/?query=${encodeURIComponent(query)}` },
-        { name: 'Constant Contact', url: `https://www.constantcontact.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'GetResponse', url: `https://www.getresponse.com/search/${encodeURIComponent(query)}` },
-        { name: 'AWeber', url: `https://www.aweber.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'ConvertKit', url: `https://convertkit.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Drip', url: `https://www.drip.com/search/${encodeURIComponent(query)}` },
-        { name: 'SendGrid', url: `https://sendgrid.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'Sendinblue', url: `https://www.sendinblue.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'EmailOctopus', url: `https://emailoctopus.com/search/${encodeURIComponent(query)}` },
-        { name: 'Moosend', url: `https://moosend.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'Benchmark Email', url: `https://www.benchmarkemail.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'MailerLite', url: `https://www.mailerlite.com/search/${encodeURIComponent(query)}` },
-        { name: 'Campaign Monitor', url: `https://www.campaignmonitor.com/search?query=${encodeURIComponent(query)}` },
-        { name: 'Omnisend', url: `https://www.omnisend.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'Klaviyo', url: `https://www.klaviyo.com/search/${encodeURIComponent(query)}` },
-        { name: 'EmailVerify', url: `https://emailverify.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'QuickEmailVerification', url: `https://quickemailverification.com/verify/${encodeURIComponent(query)}` },
-        { name: 'ZeroBounce', url: `https://www.zerobounce.net/email-validator/?email=${encodeURIComponent(query)}` },
-        { name: 'NeverBounce', url: `https://neverbounce.com/verify-email?email=${encodeURIComponent(query)}` },
-        { name: 'BriteVerify', url: `https://www.briteverify.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'EmailListVerify', url: `https://www.emaillistverify.com/verify/${encodeURIComponent(query)}` },
-        { name: 'Xverify', url: `https://www.xverify.com/email-verify?email=${encodeURIComponent(query)}` },
-        { name: 'DeBounce', url: `https://debounce.io/verify-email/${encodeURIComponent(query)}` },
-        { name: 'Kickbox', url: `https://kickbox.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'Bounceless', url: `https://bounceless.io/verify?email=${encodeURIComponent(query)}` },
-        { name: 'EmailMarker', url: `https://emailmarker.com/verify/${encodeURIComponent(query)}` },
-        { name: 'MyEmailVerifier Pro', url: `https://pro.myemailverifier.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'Emailable', url: `https://emailable.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'Bouncify', url: `https://bouncify.io/verify/${encodeURIComponent(query)}` },
-        { name: 'Mailfloss', url: `https://mailfloss.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'EmailValidator', url: `https://www.email-validator.net/email-verifier.html?email=${encodeURIComponent(query)}` },
-        { name: 'DataValidation', url: `https://www.datavalidation.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'Webbula', url: `https://www.webbula.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'FreshAddress', url: `https://www.freshaddress.com/verify/${encodeURIComponent(query)}` },
-        { name: 'AtData', url: `https://www.atdata.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'TowerData', url: `https://www.towerdata.com/email-intelligence?email=${encodeURIComponent(query)}` },
-        { name: 'Experian Email', url: `https://www.experian.com/email-validation?email=${encodeURIComponent(query)}` },
-        { name: 'Validity BriteVerify', url: `https://www.validity.com/briteverify/?email=${encodeURIComponent(query)}` },
-        { name: 'EmailAge', url: `https://www.emailage.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'IPQS Email', url: `https://www.ipqualityscore.com/free-email-verifier?email=${encodeURIComponent(query)}` },
-        { name: 'Abstract Email', url: `https://www.abstractapi.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'Apilayer Email', url: `https://apilayer.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'Mailboxlayer', url: `https://mailboxlayer.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'EmailValidation API', url: `https://emailvalidation.io/verify?email=${encodeURIComponent(query)}` },
-        { name: 'Proofy', url: `https://proofy.io/verify?email=${encodeURIComponent(query)}` },
-        { name: 'Pabbly Email', url: `https://www.pabbly.com/email-verification/?email=${encodeURIComponent(query)}` },
-        { name: 'Bouncer', url: `https://usebouncer.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'Clearout', url: `https://clearout.io/verify?email=${encodeURIComponent(query)}` },
-        { name: 'MillionVerifier', url: `https://www.millionverifier.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'Captain Verify', url: `https://captainverify.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'Reoon Email', url: `https://reoon.com/email-verifier?email=${encodeURIComponent(query)}` },
-        { name: 'EmailChecker Pro', url: `https://emailchecker.com/pro/verify?email=${encodeURIComponent(query)}` },
-        { name: 'TrueMail', url: `https://truemail.io/verify?email=${encodeURIComponent(query)}` },
-        { name: 'EmailVerification', url: `https://www.emailverification.com/verify/${encodeURIComponent(query)}` },
-        { name: 'Byteplant Email', url: `https://www.byteplant.com/email-validator?email=${encodeURIComponent(query)}` },
-        { name: 'Mailgun Verify', url: `https://www.mailgun.com/email-validation/?email=${encodeURIComponent(query)}` },
-        { name: 'SendPulse Verify', url: `https://sendpulse.com/email-verifier?email=${encodeURIComponent(query)}` },
-        { name: 'SocketLabs Email', url: `https://www.socketlabs.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'PostGrid Email', url: `https://www.postgrid.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'Lob Email', url: `https://www.lob.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'Postmark Email', url: `https://postmarkapp.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'SparkPost Email', url: `https://www.sparkpost.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'Elastic Email', url: `https://elasticemail.com/email-verifier?email=${encodeURIComponent(query)}` },
-        { name: 'SMTP2GO Email', url: `https://www.smtp2go.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'Pepipost Email', url: `https://www.pepipost.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'SocketLabs Verify', url: `https://socketlabs.com/verify-email?email=${encodeURIComponent(query)}` },
-        { name: 'EmailOversight', url: `https://www.emailoversight.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'TrustPath Email', url: `https://trustpath.com/email-verification?email=${encodeURIComponent(query)}` },
-        { name: 'EmailAnalytics', url: `https://emailanalytics.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'EmailInspector', url: `https://emailinspector.net/verify?email=${encodeURIComponent(query)}` },
-        { name: 'ValidEmail', url: `https://validemail.com/verify?email=${encodeURIComponent(query)}` },
-        { name: 'EmailAudit', url: `https://emailaudit.com/verify/${encodeURIComponent(query)}` },
-        { name: 'FindEmailAddress', url: `https://findemailaddress.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'EmailCrawlr', url: `https://emailcrawlr.com/search/${encodeURIComponent(query)}` },
-        { name: 'ContactFinder', url: `https://contactfinder.com/search?email=${encodeURIComponent(query)}` },
-        { name: 'EmailDB', url: `https://emaildb.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'EmailDirectory', url: `https://emaildirectory.com/lookup/${encodeURIComponent(query)}` },
-        { name: 'PeopleByEmail', url: `https://www.peoplebyemail.com/search?email=${encodeURIComponent(query)}` },
-        { name: 'EmailLookup', url: `https://emaillookup.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'ReverseEmailLookup', url: `https://reverseemaillookup.com/search/${encodeURIComponent(query)}` },
-        { name: 'EmailTrace', url: `https://emailtrace.com/lookup?email=${encodeURIComponent(query)}` },
-        { name: 'WhoIsEmailOwner', url: `https://whoisemailowner.com/search?email=${encodeURIComponent(query)}` },
-        { name: 'EmailOwnerFinder', url: `https://emailownerfinder.com/find/${encodeURIComponent(query)}` },
-        { name: 'EmailIdentifier', url: `https://emailidentifier.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'EmailLocator', url: `https://emaillocator.com/find?email=${encodeURIComponent(query)}` },
-        { name: 'EmailSeeker', url: `https://emailseeker.com/search/${encodeURIComponent(query)}` },
-        { name: 'EmailDiscovery', url: `https://emaildiscovery.com/lookup?email=${encodeURIComponent(query)}` },
-        { name: 'EmailIntelligence', url: `https://emailintelligence.com/search?q=${encodeURIComponent(query)}` },
-        { name: 'EmailDetective', url: `https://emaildetective.com/find/${encodeURIComponent(query)}` },
-        { name: 'EmailSherlock', url: `https://emailsherlock.com/search?email=${encodeURIComponent(query)}` },
-        { name: 'EmailTracker', url: `https://emailtracker.com/lookup/${encodeURIComponent(query)}` },
-        { name: 'EmailProfiler', url: `https://emailprofiler.com/search?q=${encodeURIComponent(query)}` }
-    ];
-
-    for (const engine of engines) {
-        try {
-            await randomDelay();
-            const response = await fetchWithRetry(engine.url, {}, 1);
-            
-            if (response.status === 200 && !response.data.includes('No results')) {
-                results.push({
-                    source: engine.name,
-                    url: engine.url,
-                    status: 'Possible matches found - manual review required'
-                });
-            }
-        } catch (e) {}
+    } catch (e) {
+        console.log(`   ⚠️  Trello search failed: ${e.message}`);
     }
 
     return results;
 }
 
-// ==================== ADVANCED WEB SCRAPING (LANJUTAN) ====================
+async function searchPeopleDataEngines(query, type, options = {}) {
+    const { maxResults = 50, skipEngines = [] } = options;
+    const results = [];
+    
+    // Enhanced engines list with more specialized services
+    const engines = [
+        // People search engines
+        { name: 'Whitepages', url: `https://www.whitepages.com/search?q=${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'ThatsThem', url: `https://thatsthem.com/email/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Spokeo', url: `https://www.spokeo.com/${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'BeenVerified', url: `https://www.beenverified.com/search/email/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'PeekYou', url: `https://www.peekyou.com/${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'Pipl', url: `https://pipl.com/search/?q=${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'ZabaSearch', url: `https://www.zabasearch.com/people/${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'AnyWho', url: `https://www.anywho.com/people/${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'PeopleFinders', url: `https://www.peoplefinders.com/search?q=${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'Intelius', url: `https://www.intelius.com/people-search/${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'TruthFinder', url: `https://www.truthfinder.com/results/?firstName=${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'InstantCheckmate', url: `https://www.instantcheckmate.com/search/?firstName=${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'USSearch', url: `https://www.ussearch.com/search?q=${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'Radaris', url: `https://radaris.com/p/${encodeURIComponent(query)}`, category: 'people' },
+        
+        // Email verification and finding services
+        { name: 'Melissa', url: `https://www.melissa.com/lookups/emails?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailHippo', url: `https://tools.emailhippo.com/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Hunter.io', url: `https://hunter.io/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Voila Norbert', url: `https://www.voilanorbert.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'RocketReach', url: `https://rocketreach.co/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'ContactOut', url: `https://contactout.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Lusha', url: `https://www.lusha.com/search/?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Clearbit', url: `https://clearbit.com/resources/tools/connect?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailRep', url: `https://emailrep.io/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Verifalia', url: `https://verifalia.com/validate-email/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailChecker', url: `https://email-checker.net/check?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'VerifyEmailAddress', url: `https://www.verifyemailaddress.org/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'TheChecker', url: `https://thechecker.co/verify-email/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'MyEmailVerifier', url: `https://www.myemailverifier.com/verify-email/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'MailTester', url: `https://www.mail-tester.com/web-${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailFinder', url: `https://emailfinder.io/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'FindThatEmail', url: `https://findthat.email/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'FindEmails', url: `https://www.findemails.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Snov.io', url: `https://snov.io/email-finder?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'LeadIQ', url: `https://leadiq.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'SignalHire', url: `https://www.signalhire.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'GetProspect', url: `https://getprospect.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Kaspr', url: `https://www.kaspr.io/tools/email-finder?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'DropContact', url: `https://www.dropcontact.com/enrichment?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Seamless.ai', url: `https://www.seamless.ai/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'AeroLeads', url: `https://aeroleads.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'LeadGibbon', url: `https://leadgibbon.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'GetEmail.io', url: `https://getemail.io/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailBreaker', url: `https://www.email-breaker.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'That\'sThem Email', url: `https://thatsthem.com/reverse-email-lookup/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailSearch.net', url: `https://www.emailsearch.net/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'ReverseContact', url: `https://www.reversecontact.com/lookup?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Personio', url: `https://www.personio.com/search?q=${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'VoilaNorbert Email', url: `https://www.voilanorbert.com/verify-email?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailSearch.io', url: `https://emailsearch.io/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'FindAnyEmail', url: `https://findanyemail.net/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailHunter', url: `https://emailhunter.co/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'BetterContact', url: `https://bettercontact.com/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Adapt.io', url: `https://adapt.io/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'LeadFuze', url: `https://www.leadfuze.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'UpLead', url: `https://www.uplead.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Cognism', url: `https://www.cognism.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'ZoomInfo', url: `https://www.zoominfo.com/search?q=${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'LeadGenius', url: `https://leadgenius.com/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Datanyze', url: `https://www.datanyze.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'DiscoverOrg', url: `https://discoverorg.com/search?query=${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'InsideView', url: `https://www.insideview.com/search?q=${encodeURIComponent(query)}`, category: 'people' },
+        { name: 'LeadSpace', url: `https://www.leadspace.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EasyLeadz', url: `https://easyleadz.com/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Leadiro', url: `https://www.leadiro.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Lead411', url: `https://www.lead411.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'LeadsPlease', url: `https://www.leadsplease.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'SalesIntel', url: `https://salesintel.io/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Oceanos', url: `https://oceanos.io/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'LeadMine', url: `https://leadmine.net/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'FindThatLead', url: `https://findthatlead.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Skrapp.io', url: `https://www.skrapp.io/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Prospect.io', url: `https://prospect.io/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Reply.io', url: `https://reply.io/email-finder/?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Salesloft', url: `https://salesloft.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Outreach.io', url: `https://www.outreach.io/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Mixmax', url: `https://www.mixmax.com/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Yesware', url: `https://www.yesware.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Cirrus Insight', url: `https://www.cirrusinsight.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Groove', url: `https://www.groove.co/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Close.com', url: `https://close.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Pipedrive', url: `https://www.pipedrive.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'HubSpot Search', url: `https://www.hubspot.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Zoho CRM', url: `https://crm.zoho.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Freshsales', url: `https://www.freshworks.com/crm/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Nimble', url: `https://www.nimble.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Salesforce Search', url: `https://www.salesforce.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Monday Sales', url: `https://monday.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Capsule CRM', url: `https://capsulecrm.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Insightly', url: `https://www.insightly.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Streak', url: `https://www.streak.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Copper', url: `https://www.copper.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Nutshell', url: `https://www.nutshell.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Agile CRM', url: `https://www.agilecrm.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Keap', url: `https://keap.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'ActiveCampaign', url: `https://www.activecampaign.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Mailchimp Search', url: `https://mailchimp.com/search/?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Constant Contact', url: `https://www.constantcontact.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'GetResponse', url: `https://www.getresponse.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'AWeber', url: `https://www.aweber.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'ConvertKit', url: `https://convertkit.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Drip', url: `https://www.drip.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'SendGrid', url: `https://sendgrid.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Sendinblue', url: `https://www.sendinblue.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailOctopus', url: `https://emailoctopus.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Moosend', url: `https://moosend.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Benchmark Email', url: `https://www.benchmarkemail.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'MailerLite', url: `https://www.mailerlite.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Campaign Monitor', url: `https://www.campaignmonitor.com/search?query=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Omnisend', url: `https://www.omnisend.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Klaviyo', url: `https://www.klaviyo.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailVerify', url: `https://emailverify.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'QuickEmailVerification', url: `https://quickemailverification.com/verify/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'ZeroBounce', url: `https://www.zerobounce.net/email-validator/?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'NeverBounce', url: `https://neverbounce.com/verify-email?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'BriteVerify', url: `https://www.briteverify.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailListVerify', url: `https://www.emaillistverify.com/verify/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Xverify', url: `https://www.xverify.com/email-verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'DeBounce', url: `https://debounce.io/verify-email/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Kickbox', url: `https://kickbox.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Bounceless', url: `https://bounceless.io/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailMarker', url: `https://emailmarker.com/verify/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'MyEmailVerifier Pro', url: `https://pro.myemailverifier.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Emailable', url: `https://emailable.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Bouncify', url: `https://bouncify.io/verify/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Mailfloss', url: `https://mailfloss.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailValidator', url: `https://www.email-validator.net/email-verifier.html?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'DataValidation', url: `https://www.datavalidation.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Webbula', url: `https://www.webbula.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'FreshAddress', url: `https://www.freshaddress.com/verify/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'AtData', url: `https://www.atdata.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'TowerData', url: `https://www.towerdata.com/email-intelligence?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Experian Email', url: `https://www.experian.com/email-validation?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Validity BriteVerify', url: `https://www.validity.com/briteverify/?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailAge', url: `https://www.emailage.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'IPQS Email', url: `https://www.ipqualityscore.com/free-email-verifier?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Abstract Email', url: `https://www.abstractapi.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Apilayer Email', url: `https://apilayer.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Mailboxlayer', url: `https://mailboxlayer.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailValidation API', url: `https://emailvalidation.io/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Proofy', url: `https://proofy.io/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Pabbly Email', url: `https://www.pabbly.com/email-verification/?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Bouncer', url: `https://usebouncer.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Clearout', url: `https://clearout.io/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'MillionVerifier', url: `https://www.millionverifier.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Captain Verify', url: `https://captainverify.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Reoon Email', url: `https://reoon.com/email-verifier?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailChecker Pro', url: `https://emailchecker.com/pro/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'TrueMail', url: `https://truemail.io/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailVerification', url: `https://www.emailverification.com/verify/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Byteplant Email', url: `https://www.byteplant.com/email-validator?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Mailgun Verify', url: `https://www.mailgun.com/email-validation/?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'SendPulse Verify', url: `https://sendpulse.com/email-verifier?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'SocketLabs Email', url: `https://www.socketlabs.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'PostGrid Email', url: `https://www.postgrid.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Lob Email', url: `https://www.lob.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Postmark Email', url: `https://postmarkapp.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'SparkPost Email', url: `https://www.sparkpost.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Elastic Email', url: `https://elasticemail.com/email-verifier?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'SMTP2GO Email', url: `https://www.smtp2go.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'Pepipost Email', url: `https://www.pepipost.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'SocketLabs Verify', url: `https://socketlabs.com/verify-email?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailOversight', url: `https://www.emailoversight.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'TrustPath Email', url: `https://trustpath.com/email-verification?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailAnalytics', url: `https://emailanalytics.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailInspector', url: `https://emailinspector.net/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'ValidEmail', url: `https://validemail.com/verify?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailAudit', url: `https://emailaudit.com/verify/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'FindEmailAddress', url: `https://findemailaddress.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailCrawlr', url: `https://emailcrawlr.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'ContactFinder', url: `https://contactfinder.com/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailDB', url: `https://emaildb.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailDirectory', url: `https://emaildirectory.com/lookup/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'PeopleByEmail', url: `https://www.peoplebyemail.com/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailLookup', url: `https://emaillookup.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'ReverseEmailLookup', url: `https://reverseemaillookup.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailTrace', url: `https://emailtrace.com/lookup?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'WhoIsEmailOwner', url: `https://whoisemailowner.com/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailOwnerFinder', url: `https://emailownerfinder.com/find/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailIdentifier', url: `https://emailidentifier.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailLocator', url: `https://emaillocator.com/find?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailSeeker', url: `https://emailseeker.com/search/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailDiscovery', url: `https://emaildiscovery.com/lookup?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailIntelligence', url: `https://emailintelligence.com/search?q=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailDetective', url: `https://emaildetective.com/find/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailSherlock', url: `https://emailsherlock.com/search?email=${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailTracker', url: `https://emailtracker.com/lookup/${encodeURIComponent(query)}`, category: 'email' },
+        { name: 'EmailProfiler', url: `https://emailprofiler.com/search?q=${encodeURIComponent(query)}`, category: 'email' }
+    ];
 
-async function deepScrapeWebsite(url, searchQuery) {
+    // Filter engines based on type and skip list
+    let filteredEngines = engines;
+    
+    if (type === 'email') {
+        filteredEngines = engines.filter(e => e.category === 'email');
+    } else if (type === 'people') {
+        filteredEngines = engines.filter(e => e.category === 'people');
+    }
+    
+    if (skipEngines.length > 0) {
+        filteredEngines = filteredEngines.filter(e => 
+            !skipEngines.some(skip => e.name.toLowerCase().includes(skip.toLowerCase()))
+        );
+    }
+    
+    // Limit the number of engines
+    filteredEngines = filteredEngines.slice(0, maxResults);
+
+    for (const engine of filteredEngines) {
+        try {
+            await randomDelay(500, 1500);
+            const response = await fetchWithRetry(engine.url, { timeout: 5000 }, 1);
+            
+            if (response.status === 200 && !response.data.includes('No results')) {
+                results.push({
+                    source: engine.name,
+                    url: engine.url,
+                    category: engine.category,
+                    status: 'Possible matches found - manual review required',
+                    relevance: 0.5 // Default relevance for people data engines
+                });
+            }
+        } catch (e) {
+            // Silently continue if an engine fails
+        }
+    }
+
+    return results;
+}
+
+// ==================== ADVANCED WEB SCRAPING ====================
+
+async function deepScrapeWebsite(url, searchQuery, options = {}) {
+    const {
+        maxDepth = 1,
+        followExternalLinks = false,
+        includeImages = true,
+        includeScripts = true,
+        includeMetadata = true,
+        includeTechStack = true,
+        includeSecurityAnalysis = true
+    } = options;
+    
     try {
-        const response = await fetchWithRetry(url);
+        const response = await fetchWithRetry(url, { timeout: 15000 });
         
         if (response.status !== 200) {
             return { error: `Status ${response.status}` };
@@ -19777,93 +20113,104 @@ async function deepScrapeWebsite(url, searchQuery) {
             techStack: [],
             seoData: {},
             securityHeaders: {},
-            cookies: []
+            cookies: [],
+            securityIssues: []
         };
 
+        // Extract emails with more sophisticated regex
         const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
         const emails = text.match(emailRegex) || [];
         findings.emails = [...new Set(emails)];
 
-        const phoneRegex1 = /(\+62|62|0)[0-9]{9,13}/g;
-        const phoneRegex2 = /(\+1|1)?[\s.-]?\(?[0-9]{3}\)?[\s.-]?[0-9]{3}[\s.-]?[0-9]{4}/g;
-        const phoneRegex3 = /(\+44|44|0)[0-9]{10}/g;
-        const phoneRegex4 = /(\+91|91)?[0-9]{10}/g;
-        const phoneRegex5 = /(\+86|86)?1[0-9]{10}/g;
-        const phoneRegex6 = /(\+61|61)?[0-9]{9}/g;
-        const phoneRegex7 = /(\+49|49)?[0-9]{10,11}/g;
-        const phoneRegex8 = /(\+33|33)?[0-9]{9}/g;
-        const phoneRegex9 = /(\+81|81)?[0-9]{10}/g;
-        const phoneRegex10 = /(\+82|82)?[0-9]{10,11}/g;
+        // Extract phone numbers with international formats
+        const phoneRegexes = [
+            /(\+62|62|0)[0-9]{9,13}/g,  // Indonesia
+            /(\+1|1)?[\s.-]?\(?[0-9]{3}\)?[\s.-]?[0-9]{3}[\s.-]?[0-9]{4}/g,  // US/Canada
+            /(\+44|44|0)[0-9]{10}/g,  // UK
+            /(\+91|91)?[0-9]{10}/g,  // India
+            /(\+86|86)?1[0-9]{10}/g,  // China
+            /(\+61|61)?[0-9]{9}/g,  // Australia
+            /(\+49|49)?[0-9]{10,11}/g,  // Germany
+            /(\+33|33)?[0-9]{9}/g,  // France
+            /(\+81|81)?[0-9]{10}/g,  // Japan
+            /(\+82|82)?[0-9]{10,11}/g  // South Korea
+        ];
         
-        const phones1 = text.match(phoneRegex1) || [];
-        const phones2 = text.match(phoneRegex2) || [];
-        const phones3 = text.match(phoneRegex3) || [];
-        const phones4 = text.match(phoneRegex4) || [];
-        const phones5 = text.match(phoneRegex5) || [];
-        const phones6 = text.match(phoneRegex6) || [];
-        const phones7 = text.match(phoneRegex7) || [];
-        const phones8 = text.match(phoneRegex8) || [];
-        const phones9 = text.match(phoneRegex9) || [];
-        const phones10 = text.match(phoneRegex10) || [];
-        
-        findings.phones = [...new Set([...phones1, ...phones2, ...phones3, ...phones4, ...phones5, ...phones6, ...phones7, ...phones8, ...phones9, ...phones10])];
+        const phones = [];
+        phoneRegexes.forEach(regex => {
+            const matches = text.match(regex) || [];
+            phones.push(...matches);
+        });
+        findings.phones = [...new Set(phones)];
 
-        const btcRegex = /\b[13][a-km-zA-HJ-NP-Z1-9]{25,34}\b/g;
-        const ethRegex = /\b0x[a-fA-F0-9]{40}\b/g;
-        const ltcRegex = /\b[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}\b/g;
-        const xrpRegex = /\br[a-zA-Z0-9]{24,34}\b/g;
-        const dogeRegex = /\bD[5-9A-HJ-NP-U][1-9A-HJ-NP-Za-km-z]{32}\b/g;
+        // Extract cryptocurrency wallet addresses
+        const cryptoRegexes = {
+            bitcoin: /\b[13][a-km-zA-HJ-NP-Z1-9]{25,34}\b/g,
+            ethereum: /\b0x[a-fA-F0-9]{40}\b/g,
+            litecoin: /\b[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}\b/g,
+            ripple: /\br[a-zA-Z0-9]{24,34}\b/g,
+            dogecoin: /\bD[5-9A-HJ-NP-U][1-9A-HJ-NP-Za-km-z]{32}\b/g
+        };
         
-        const btc = text.match(btcRegex) || [];
-        const eth = text.match(ethRegex) || [];
-        const ltc = text.match(ltcRegex) || [];
-        const xrp = text.match(xrpRegex) || [];
-        const doge = text.match(dogeRegex) || [];
-        
-        btc.forEach(w => findings.cryptoWallets.push({ type: 'Bitcoin', address: w }));
-        eth.forEach(w => findings.cryptoWallets.push({ type: 'Ethereum', address: w }));
-        ltc.forEach(w => findings.cryptoWallets.push({ type: 'Litecoin', address: w }));
-        xrp.forEach(w => findings.cryptoWallets.push({ type: 'Ripple', address: w }));
-        doge.forEach(w => findings.cryptoWallets.push({ type: 'Dogecoin', address: w }));
+        Object.entries(cryptoRegexes).forEach(([type, regex]) => {
+            const matches = text.match(regex) || [];
+            matches.forEach(match => {
+                findings.cryptoWallets.push({ type: type.charAt(0).toUpperCase() + type.slice(1), address: match });
+            });
+        });
 
+        // Extract IP addresses
         const ipv4Regex = /\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b/g;
         const ipv6Regex = /\b(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}\b/gi;
         const ipv4s = text.match(ipv4Regex) || [];
         const ipv6s = text.match(ipv6Regex) || [];
         findings.ipAddresses = [...new Set([...ipv4s, ...ipv6s])];
 
+        // Extract domains
         const domainRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?)/g;
         const domains = text.match(domainRegex) || [];
         findings.domains = [...new Set(domains)];
 
+        // Extract usernames
         const usernameRegex = /@([a-zA-Z0-9_]{3,20})/g;
         const usernames = text.match(usernameRegex) || [];
         findings.usernames = [...new Set(usernames)];
 
-        const apiKeyRegex1 = /[aA][pP][iI][-_]?[kK][eE][yY][\s:=]+['"]?([a-zA-Z0-9_\-]{20,})['"]?/g;
-        const apiKeyRegex2 = /[aA][cC][cC][eE][sS][sS][-_]?[tT][oO][kK][eE][nN][\s:=]+['"]?([a-zA-Z0-9_\-]{20,})['"]?/g;
-        const apiKeyRegex3 = /[sS][eE][cC][rR][eE][tT][-_]?[kK][eE][yY][\s:=]+['"]?([a-zA-Z0-9_\-]{20,})['"]?/g;
-        const apiKeyRegex4 = /AKIA[0-9A-Z]{16}/g;
-        const apiKeyRegex5 = /AIza[0-9A-Za-z\-_]{35}/g;
+        // Extract API keys and secrets
+        const apiKeyRegexes = [
+            /[aA][pP][iI][-_]?[kK][eE][yY][\s:=]+['"]?([a-zA-Z0-9_\-]{20,})['"]?/g,
+            /[aA][cC][cC][eE][sS][sS][-_]?[tT][oO][kK][eE][nN][\s:=]+['"]?([a-zA-Z0-9_\-]{20,})['"]?/g,
+            /[sS][eE][cC][rR][eE][tT][-_]?[kK][eE][yY][\s:=]+['"]?([a-zA-Z0-9_\-]{20,})['"]?/g,
+            /AKIA[0-9A-Z]{16}/g,  // AWS Access Key
+            /AIza[0-9A-Za-z\-_]{35}/g,  // Google API Key
+            /[sS][kK][-\_]?[a-zA-Z0-9]{32}/g,  // Stripe Key
+            /[pP][kK][-_]?[lL][iI][vV][eE][-_]?[a-zA-Z0-9]{32}/g,  // Stripe Live Key
+            /[sS][eE][cC][rR][eE][tT][-_]?[kK][eE][yY][-_]?[bB][aA][sS][eE][6-4][\s:=]+['"]?([a-zA-Z0-9+/]{40})['"]?/g  // Base64 encoded secret
+        ];
         
-        const apiKeys1 = htmlContent.match(apiKeyRegex1) || [];
-        const apiKeys2 = htmlContent.match(apiKeyRegex2) || [];
-        const apiKeys3 = htmlContent.match(apiKeyRegex3) || [];
-        const apiKeys4 = htmlContent.match(apiKeyRegex4) || [];
-        const apiKeys5 = htmlContent.match(apiKeyRegex5) || [];
-        
-        findings.apiKeys = [...new Set([...apiKeys1, ...apiKeys2, ...apiKeys3, ...apiKeys4, ...apiKeys5])];
+        const apiKeys = [];
+        apiKeyRegexes.forEach(regex => {
+            const matches = htmlContent.match(regex) || [];
+            apiKeys.push(...matches);
+        });
+        findings.apiKeys = [...new Set(apiKeys)];
 
-        const passwordRegex = /[pP][aA][sS][sS][wW][oO][rR][dD][\s:=]+['"]?([^\s'"]{6,})['"]?/g;
-        const usernameCredRegex = /[uU][sS][eE][rR][nN][aA][mM][eE][\s:=]+['"]?([^\s'"]{3,})['"]?/g;
-        const loginRegex = /[lL][oO][gG][iI][nN][\s:=]+['"]?([^\s'"]{3,})['"]?/g;
+        // Extract credentials
+        const credentialRegexes = [
+            /[pP][aA][sS][sS][wW][oO][rR][dD][\s:=]+['"]?([^\s'"]{6,})['"]?/g,
+            /[uU][sS][eE][rR][nN][aA][mM][eE][\s:=]+['"]?([^\s'"]{3,})['"]?/g,
+            /[lL][oO][gG][iI][nN][\s:=]+['"]?([^\s'"]{3,})['"]?/g,
+            /[cC][rR][eE][dD][eE][nN][tT][iI][aA][lL][sS][\s:=]+['"]?([^\s'"]{10,})['"]?/g
+        ];
         
-        const passwords = htmlContent.match(passwordRegex) || [];
-        const userCreds = htmlContent.match(usernameCredRegex) || [];
-        const logins = htmlContent.match(loginRegex) || [];
-        
-        findings.credentials = [...new Set([...passwords, ...userCreds, ...logins])];
+        const credentials = [];
+        credentialRegexes.forEach(regex => {
+            const matches = htmlContent.match(regex) || [];
+            credentials.push(...matches);
+        });
+        findings.credentials = [...new Set(credentials)];
 
+        // Extract social media links
         const socialPlatforms = [
             'facebook', 'instagram', 'twitter', 'linkedin', 'tiktok', 'youtube', 
             'github', 'gitlab', 'bitbucket', 'reddit', 'pinterest', 'snapchat',
@@ -19888,9 +20235,11 @@ async function deepScrapeWebsite(url, searchQuery) {
             }
         });
 
+        // Extract file links
         const fileExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 
                                'zip', 'rar', '7z', 'tar', 'gz', 'sql', 'db', 'csv',
-                               'json', 'xml', 'txt', 'log', 'bak', 'conf', 'config'];
+                               'json', 'xml', 'txt', 'log', 'bak', 'conf', 'config',
+                               'env', 'key', 'pem', 'crt', 'p12', 'pfx'];
         
         $('a').each((i, elem) => {
             const href = $(elem).attr('href');
@@ -19907,32 +20256,43 @@ async function deepScrapeWebsite(url, searchQuery) {
             }
         });
 
-        $('a').each((i, elem) => {
-            const href = $(elem).attr('href');
-            if (href && (href.startsWith('http://') || href.startsWith('https://')) && !href.includes(new URL(url).hostname)) {
-                findings.externalLinks.push({
-                    url: href,
-                    text: $(elem).text().trim(),
-                    rel: $(elem).attr('rel')
-                });
-            }
-        });
+        // Extract external links
+        if (followExternalLinks) {
+            $('a').each((i, elem) => {
+                const href = $(elem).attr('href');
+                if (href && (href.startsWith('http://') || href.startsWith('https://')) && !href.includes(new URL(url).hostname)) {
+                    findings.externalLinks.push({
+                        url: href,
+                        text: $(elem).text().trim(),
+                        rel: $(elem).attr('rel')
+                    });
+                }
+            });
+        }
 
-        $('img').each((i, elem) => {
-            findings.images.push({
+        // Extract images
+        if (includeImages) {
+            $('img').each((i, elem) => {
+                findings.images.push({
+                    src: $(elem).attr('src'),
+                    alt: $(elem).attr('alt'),
+                    title: $(elem).attr('title'),
+                    width: $(elem).attr('width'),
+                    height: $(elem).attr('height')
+                });
+            });
+        }
+
+        // Extract videos
+        $('video, iframe[src*="youtube"], iframe[src*="vimeo"]').each((i, elem) => {
+            findings.videos.push({
                 src: $(elem).attr('src'),
-                alt: $(elem).attr('alt'),
+                type: elem.name,
                 title: $(elem).attr('title')
             });
         });
 
-        $('video, iframe[src*="youtube"], iframe[src*="vimeo"]').each((i, elem) => {
-            findings.videos.push({
-                src: $(elem).attr('src'),
-                type: elem.name
-            });
-        });
-
+        // Extract forms
         $('form').each((i, elem) => {
             const inputs = [];
             $(elem).find('input, textarea, select').each((j, input) => {
@@ -19940,38 +20300,47 @@ async function deepScrapeWebsite(url, searchQuery) {
                     type: $(input).attr('type') || 'text',
                     name: $(input).attr('name'),
                     id: $(input).attr('id'),
-                    placeholder: $(input).attr('placeholder')
+                    placeholder: $(input).attr('placeholder'),
+                    required: $(input).prop('required')
                 });
             });
             findings.forms.push({
                 action: $(elem).attr('action'),
                 method: $(elem).attr('method'),
-                inputs: inputs
+                inputs: inputs,
+                hasPasswordField: inputs.some(input => input.type === 'password')
             });
         });
 
+        // Extract HTML comments
         const commentRegex = /<!--([\s\S]*?)-->/g;
         const comments = htmlContent.match(commentRegex) || [];
         findings.comments = comments.map(c => c.substring(4, c.length - 3).trim());
 
-        $('script').each((i, elem) => {
-            const src = $(elem).attr('src');
-            if (src) {
-                findings.scripts.push({
-                    type: 'external',
-                    src: src
-                });
-            } else {
-                const content = $(elem).html();
-                if (content && content.length > 0) {
+        // Extract scripts
+        if (includeScripts) {
+            $('script').each((i, elem) => {
+                const src = $(elem).attr('src');
+                if (src) {
                     findings.scripts.push({
-                        type: 'inline',
-                        content: content.substring(0, 200)
+                        type: 'external',
+                        src: src,
+                        integrity: $(elem).attr('integrity'),
+                        crossorigin: $(elem).attr('crossorigin')
                     });
+                } else {
+                    const content = $(elem).html();
+                    if (content && content.length > 0) {
+                        findings.scripts.push({
+                            type: 'inline',
+                            content: content.substring(0, 200)
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }
 
+        // Find search query matches
         if (text.includes(searchQuery.toLowerCase())) {
             const contexts = [];
             let searchIndex = 0;
@@ -19983,65 +20352,153 @@ async function deepScrapeWebsite(url, searchQuery) {
             findings.matches = contexts;
         }
 
-        findings.metadata = {
-            description: $('meta[name="description"]').attr('content'),
-            keywords: $('meta[name="keywords"]').attr('content'),
-            author: $('meta[name="author"]').attr('content'),
-            robots: $('meta[name="robots"]').attr('content'),
-            viewport: $('meta[name="viewport"]').attr('content'),
-            charset: $('meta[charset]').attr('charset'),
-            ogTitle: $('meta[property="og:title"]').attr('content'),
-            ogDescription: $('meta[property="og:description"]').attr('content'),
-            ogImage: $('meta[property="og:image"]').attr('content'),
-            ogUrl: $('meta[property="og:url"]').attr('content'),
-            ogType: $('meta[property="og:type"]').attr('content'),
-            twitterCard: $('meta[name="twitter:card"]').attr('content'),
-            twitterSite: $('meta[name="twitter:site"]').attr('content'),
-            twitterCreator: $('meta[name="twitter:creator"]').attr('content'),
-            canonical: $('link[rel="canonical"]').attr('href'),
-            favicon: $('link[rel="icon"], link[rel="shortcut icon"]').attr('href')
-        };
+        // Extract metadata
+        if (includeMetadata) {
+            findings.metadata = {
+                description: $('meta[name="description"]').attr('content'),
+                keywords: $('meta[name="keywords"]').attr('content'),
+                author: $('meta[name="author"]').attr('content'),
+                robots: $('meta[name="robots"]').attr('content'),
+                viewport: $('meta[name="viewport"]').attr('content'),
+                charset: $('meta[charset]').attr('charset'),
+                ogTitle: $('meta[property="og:title"]').attr('content'),
+                ogDescription: $('meta[property="og:description"]').attr('content'),
+                ogImage: $('meta[property="og:image"]').attr('content'),
+                ogUrl: $('meta[property="og:url"]').attr('content'),
+                ogType: $('meta[property="og:type"]').attr('content'),
+                twitterCard: $('meta[name="twitter:card"]').attr('content'),
+                twitterSite: $('meta[name="twitter:site"]').attr('content'),
+                twitterCreator: $('meta[name="twitter:creator"]').attr('content'),
+                canonical: $('link[rel="canonical"]').attr('href'),
+                favicon: $('link[rel="icon"], link[rel="shortcut icon"]').attr('href'),
+                generator: $('meta[name="generator"]').attr('content'),
+                themeColor: $('meta[name="theme-color"]').attr('content'),
+                appleTouchIcon: $('link[rel="apple-touch-icon"]').attr('href'),
+                manifest: $('link[rel="manifest"]').attr('href')
+            };
+        }
 
-        const techIndicators = {
-            'WordPress': /wp-content|wp-includes|wordpress/i,
-            'Joomla': /joomla|com_content/i,
-            'Drupal': /drupal|sites\/default/i,
-            'React': /react|reactjs|_react/i,
-            'Vue.js': /vue|vuejs|_vue/i,
-            'Angular': /angular|ng-app/i,
-            'jQuery': /jquery/i,
-            'Bootstrap': /bootstrap/i,
-            'Tailwind': /tailwind/i,
-            'Next.js': /next\/|_next/i,
-            'Laravel': /laravel/i,
-            'Django': /django/i,
-            'Flask': /flask/i,
-            'Express': /express/i,
-            'ASP.NET': /asp\.net|__viewstate/i,
-            'PHP': /\.php|<?php/i,
-            'Node.js': /node|nodejs/i,
-            'Gatsby': /gatsby/i,
-            'Nuxt': /nuxt/i,
-            'Svelte': /svelte/i,
-            'Shopify': /shopify|myshopify/i,
-            'WooCommerce': /woocommerce/i,
-            'Magento': /magento/i,
-            'PrestaShop': /prestashop/i,
-            'OpenCart': /opencart/i,
-            'Cloudflare': /cloudflare|__cf/i,
-            'Google Analytics': /google-analytics|gtag/i,
-            'Google Tag Manager': /googletagmanager/i,
-            'Font Awesome': /font-awesome|fontawesome/i,
-            'Stripe': /stripe\.com|stripe\.js/i,
-            'PayPal': /paypal\.com/i
-        };
+        // Detect technology stack
+        if (includeTechStack) {
+            const techIndicators = {
+                // CMS
+                'WordPress': /wp-content|wp-includes|wordpress/i,
+                'Joomla': /joomla|com_content/i,
+                'Drupal': /drupal|sites\/default/i,
+                'Magento': /magento|skin\/frontend/i,
+                'Shopify': /shopify|myshopify/i,
+                'WooCommerce': /woocommerce/i,
+                'PrestaShop': /prestashop/i,
+                'OpenCart': /opencart/i,
+                
+                // Frontend frameworks
+                'React': /react|reactjs|_react/i,
+                'Vue.js': /vue|vuejs|_vue/i,
+                'Angular': /angular|ng-app/i,
+                'Svelte': /svelte/i,
+                'Next.js': /next\/|_next/i,
+                'Nuxt.js': /nuxt/i,
+                'Gatsby': /gatsby/i,
+                
+                // Backend frameworks
+                'Laravel': /laravel/i,
+                'Django': /django/i,
+                'Flask': /flask/i,
+                'Express': /express/i,
+                'ASP.NET': /asp\.net|__viewstate/i,
+                'Ruby on Rails': /rails/i,
+                'Spring': /springframework/i,
+                'Symfony': /symfony/i,
+                
+                // Languages
+                'PHP': /\.php|<?php/i,
+                'Node.js': /node|nodejs/i,
+                'Python': /python/i,
+                'Java': /\.java|javax/i,
+                'C#': /\.cs|microsoft/i,
+                'Ruby': /\.rb|ruby/i,
+                'Go': /\.go|golang/i,
+                'Rust': /\.rs|rust/i,
+                
+                // Databases
+                'MySQL': /mysql/i,
+                'PostgreSQL': /postgresql|postgres/i,
+                'MongoDB': /mongodb/i,
+                'SQLite': /sqlite/i,
+                'Redis': /redis/i,
+                'Elasticsearch': /elasticsearch/i,
+                
+                // JavaScript libraries
+                'jQuery': /jquery/i,
+                'Bootstrap': /bootstrap/i,
+                'Tailwind': /tailwind/i,
+                'Foundation': /foundation/i,
+                'Material-UI': /material-ui|mui/i,
+                'Ant Design': /antd|ant-design/i,
+                
+                // Analytics and tracking
+                'Google Analytics': /google-analytics|gtag/i,
+                'Google Tag Manager': /googletagmanager/i,
+                'Hotjar': /hotjar/i,
+                'Mixpanel': /mixpanel/i,
+                'Segment': /segment/i,
+                'Adobe Analytics': /omniture|adobe-analytics/i,
+                
+                // CDNs
+                'Cloudflare': /cloudflare|__cf/i,
+                'AWS CloudFront': /cloudfront/i,
+                'Fastly': /fastly/i,
+                'Akamai': /akamai/i,
+                
+                // Payment processors
+                'Stripe': /stripe\.com|stripe\.js/i,
+                'PayPal': /paypal\.com/i,
+                'Braintree': /braintree/i,
+                'Square': /squareup\.com/i,
+                
+                // Marketing tools
+                'HubSpot': /hubspot/i,
+                'Marketo': /marketo/i,
+                'Pardot': /pardot/i,
+                'Mailchimp': /mailchimp/i,
+                
+                // Testing tools
+                'Selenium': /selenium/i,
+                'Cypress': /cypress/i,
+                'Jest': /jest/i,
+                'Mocha': /mocha/i,
+                
+                // Build tools
+                'Webpack': /webpack/i,
+                'Gulp': /gulp/i,
+                'Grunt': /grunt/i,
+                'Vite': /vite/i,
+                'Parcel': /parcel/i,
+                
+                // Package managers
+                'npm': /npm/i,
+                'Yarn': /yarn/i,
+                'Composer': /composer/i,
+                'Pip': /pip/i,
+                
+                // Hosting providers
+                'Netlify': /netlify/i,
+                'Vercel': /vercel/i,
+                'Heroku': /heroku/i,
+                'DigitalOcean': /digitalocean/i,
+                'AWS': /aws|amazonaws/i,
+                'Azure': /azure/i,
+                'Google Cloud': /googleapis|gcp/i
+            };
 
-        Object.entries(techIndicators).forEach(([tech, regex]) => {
-            if (regex.test(htmlContent)) {
-                findings.techStack.push(tech);
-            }
-        });
+            Object.entries(techIndicators).forEach(([tech, regex]) => {
+                if (regex.test(htmlContent)) {
+                    findings.techStack.push(tech);
+                }
+            });
+        }
 
+        // SEO data analysis
         findings.seoData = {
             titleLength: $('title').text().length,
             metaDescLength: ($('meta[name="description"]').attr('content') || '').length,
@@ -20052,32 +20509,138 @@ async function deepScrapeWebsite(url, searchQuery) {
             imagesWithoutAlt: $('img:not([alt])').length,
             internalLinks: $('a[href^="/"], a[href^="' + url + '"]').length,
             externalLinks: findings.externalLinks.length,
-            wordCount: text.split(/\s+/).length
+            wordCount: text.split(/\s+/).length,
+            hasCanonical: !!$('link[rel="canonical"]').attr('href'),
+            hasStructuredData: $('script[type="application/ld+json"]').length > 0,
+            hasOpenGraph: Object.keys(findings.metadata).filter(k => k.startsWith('og')).length > 0,
+            hasTwitterCard: !!findings.metadata.twitterCard,
+            hasViewport: !!findings.metadata.viewport,
+            hasRobots: !!findings.metadata.robots,
+            hasDescription: !!findings.metadata.description,
+            hasKeywords: !!findings.metadata.keywords
         };
 
-        findings.securityHeaders = {
-            server: response.headers['server'],
-            xFrameOptions: response.headers['x-frame-options'],
-            xContentTypeOptions: response.headers['x-content-type-options'],
-            strictTransportSecurity: response.headers['strict-transport-security'],
-            contentSecurityPolicy: response.headers['content-security-policy'],
-            xXssProtection: response.headers['x-xss-protection'],
-            referrerPolicy: response.headers['referrer-policy']
-        };
+        // Security headers analysis
+        if (includeSecurityAnalysis) {
+            findings.securityHeaders = {
+                server: response.headers['server'],
+                xFrameOptions: response.headers['x-frame-options'],
+                xContentTypeOptions: response.headers['x-content-type-options'],
+                strictTransportSecurity: response.headers['strict-transport-security'],
+                contentSecurityPolicy: response.headers['content-security-policy'],
+                xXssProtection: response.headers['x-xss-protection'],
+                referrerPolicy: response.headers['referrer-policy'],
+                permissionsPolicy: response.headers['permissions-policy'],
+                featurePolicy: response.headers['feature-policy']
+            };
 
-        const cookieHeader = response.headers['set-cookie'];
-        if (cookieHeader) {
-            const cookieArray = Array.isArray(cookieHeader) ? cookieHeader : [cookieHeader];
-            findings.cookies = cookieArray.map(cookie => {
-                const parts = cookie.split(';')[0].split('=');
-                return {
-                    name: parts[0],
-                    value: parts[1],
-                    secure: cookie.includes('Secure'),
-                    httpOnly: cookie.includes('HttpOnly'),
-                    sameSite: cookie.match(/SameSite=(\w+)/)?.[1]
-                };
+            // Cookie analysis
+            const cookieHeader = response.headers['set-cookie'];
+            if (cookieHeader) {
+                const cookieArray = Array.isArray(cookieHeader) ? cookieHeader : [cookieHeader];
+                findings.cookies = cookieArray.map(cookie => {
+                    const parts = cookie.split(';')[0].split('=');
+                    return {
+                        name: parts[0],
+                        value: parts[1],
+                        secure: cookie.includes('Secure'),
+                        httpOnly: cookie.includes('HttpOnly'),
+                        sameSite: cookie.match(/SameSite=(\w+)/)?.[1],
+                        path: cookie.match(/path=([^;]+)/)?.[1],
+                        domain: cookie.match(/domain=([^;]+)/)?.[1],
+                        expires: cookie.match(/expires=([^;]+)/)?.[1]
+                    };
+                });
+            }
+
+            // Security issues detection
+            findings.securityIssues = [];
+            
+            // Check for missing security headers
+            if (!findings.securityHeaders.xFrameOptions) {
+                findings.securityIssues.push({
+                    severity: 'medium',
+                    issue: 'Missing X-Frame-Options header',
+                    description: 'The site may be vulnerable to clickjacking attacks'
+                });
+            }
+            
+            if (!findings.securityHeaders.xContentTypeOptions) {
+                findings.securityIssues.push({
+                    severity: 'medium',
+                    issue: 'Missing X-Content-Type-Options header',
+                    description: 'The site may be vulnerable to MIME type sniffing attacks'
+                });
+            }
+            
+            if (!findings.securityHeaders.strictTransportSecurity) {
+                findings.securityIssues.push({
+                    severity: 'high',
+                    issue: 'Missing Strict-Transport-Security header',
+                    description: 'The site does not enforce HTTPS connections'
+                });
+            }
+            
+            if (!findings.securityHeaders.contentSecurityPolicy) {
+                findings.securityIssues.push({
+                    severity: 'high',
+                    issue: 'Missing Content-Security-Policy header',
+                    description: 'The site may be vulnerable to XSS attacks'
+                });
+            }
+            
+            // Check for insecure cookies
+            findings.cookies.forEach(cookie => {
+                if (!cookie.secure && url.startsWith('https://')) {
+                    findings.securityIssues.push({
+                        severity: 'medium',
+                        issue: 'Insecure cookie without Secure flag',
+                        description: `Cookie ${cookie.name} can be transmitted over unencrypted connections`
+                    });
+                }
+                
+                if (!cookie.httpOnly && cookie.name.toLowerCase().includes('session')) {
+                    findings.securityIssues.push({
+                        severity: 'medium',
+                        issue: 'Session cookie without HttpOnly flag',
+                        description: `Cookie ${cookie.name} can be accessed by client-side scripts`
+                    });
+                }
             });
+            
+            // Check for exposed sensitive information
+            if (findings.apiKeys.length > 0) {
+                findings.securityIssues.push({
+                    severity: 'high',
+                    issue: 'Potential API keys exposed',
+                    description: `${findings.apiKeys.length} potential API keys found in the page source`
+                });
+            }
+            
+            if (findings.credentials.length > 0) {
+                findings.securityIssues.push({
+                    severity: 'high',
+                    issue: 'Potential credentials exposed',
+                    description: `${findings.credentials.length} potential credentials found in the page source`
+                });
+            }
+            
+            // Check for outdated software
+            if (findings.techStack.includes('jQuery')) {
+                const jqueryMatch = htmlContent.match(/jquery[.-]?(\d+\.\d+\.\d+)/i);
+                if (jqueryMatch) {
+                    const version = jqueryMatch[1];
+                    const [major, minor] = version.split('.').map(Number);
+                    
+                    if (major < 3 || (major === 3 && minor < 4)) {
+                        findings.securityIssues.push({
+                            severity: 'medium',
+                            issue: 'Outdated jQuery version',
+                            description: `jQuery ${version} may have known vulnerabilities`
+                        });
+                    }
+                }
+            }
         }
 
         return findings;
@@ -20098,16 +20661,31 @@ function extractContext(text, query, contextLength = 200, startIndex = null) {
 
 // ==================== BREACH DATABASE CHECK ====================
 
-async function checkHaveIBeenPwned(email) {
+async function checkHaveIBeenPwned(email, options = {}) {
+    const { apiKey = null, includeUnverified = false } = options;
+    
     try {
         console.log('   🔍 Checking breach databases...');
         
-        // Note: HIBP requires API key for automated queries
-        // This is a simplified version
-        const response = await fetchWithRetry(`https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(email)}?truncateResponse=false`, {
-            headers: {
-                'User-Agent': 'OSINT-Research-Tool'
-            }
+        let url = `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(email)}?truncateResponse=false`;
+        
+        if (includeUnverified) {
+            url += '&includeUnverified=true';
+        }
+        
+        const headers = {
+            'User-Agent': 'OSINT-Research-Tool'
+        };
+        
+        if (apiKey) {
+            headers['hibp-api-key'] = apiKey;
+        } else {
+            console.log('   ⚠️  No HIBP API key provided - results may be limited');
+        }
+        
+        const response = await fetchWithRetry(url, {
+            headers,
+            timeout: 15000
         }, 1);
 
         if (response.status === 200 && Array.isArray(response.data)) {
@@ -20119,81 +20697,235 @@ async function checkHaveIBeenPwned(email) {
                 addedDate: breach.AddedDate,
                 dataClasses: breach.DataClasses,
                 pwnCount: breach.PwnCount,
-                description: breach.Description
+                description: breach.Description,
+                isVerified: breach.IsVerified,
+                isFabricated: breach.IsFabricated,
+                isSensitive: breach.IsSensitive,
+                isRetired: breach.IsRetired,
+                isSpamList: breach.IsSpamList
             }));
         } else if (response.status === 404) {
             return { status: 'No breaches found' };
+        } else if (response.status === 401) {
+            return { error: 'Invalid or missing HIBP API key' };
+        } else if (response.status === 429) {
+            return { error: 'Rate limited - please try again later' };
         }
     } catch (e) {
-        return { error: 'HIBP check unavailable - requires API key' };
+        return { error: `HIBP check failed: ${e.message}` };
     }
 }
 
-async function checkDehashedDatabase(query) {
-    // Dehashed requires paid API access
-    return {
-        service: 'Dehashed',
-        note: 'Commercial service - requires paid subscription',
-        url: `https://dehashed.com/search?query=${encodeURIComponent(query)}`
-    };
+async function checkDehashedDatabase(query, options = {}) {
+    const { apiKey = null, type = 'email' } = options;
+    
+    if (!apiKey) {
+        return {
+            service: 'Dehashed',
+            note: 'Commercial service - requires paid subscription',
+            url: `https://dehashed.com/search?query=${encodeURIComponent(query)}`
+        };
+    }
+    
+    try {
+        console.log('   🔍 Checking Dehashed database...');
+        
+        const response = await fetchWithRetry('https://api.dehashed.com/search', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            data: {
+                query: query,
+                size: 100
+            },
+            timeout: 15000
+        }, 1);
+        
+        if (response.status === 200 && response.data.entries) {
+            return {
+                service: 'Dehashed',
+                results: response.data.entries.map(entry => ({
+                    id: entry.id,
+                    email: entry.email,
+                    username: entry.username,
+                    name: entry.name,
+                    vin: entry.vin,
+                    address: entry.address,
+                    phone: entry.phone,
+                    hashedPassword: entry.hashedPassword,
+                    ipAddress: entry.ip_address,
+                    database: entry.database_name,
+                    source: entry.leached_from
+                }))
+            };
+        }
+    } catch (e) {
+        return { error: `Dehashed check failed: ${e.message}` };
+    }
 }
 
-async function checkIntelligenceX(query) {
-    return {
-        service: 'Intelligence X',
-        note: 'Commercial OSINT search engine',
-        url: `https://intelx.io/?s=${encodeURIComponent(query)}`
-    };
+async function checkIntelligenceX(query, options = {}) {
+    const { apiKey = null, limit = 100 } = options;
+    
+    try {
+        console.log('   🔍 Checking Intelligence X...');
+        
+        let url = `https://2.intelx.io/phonebook/search`;
+        
+        if (apiKey) {
+            const response = await fetchWithRetry(url, {
+                method: 'POST',
+                headers: {
+                    'x-key': apiKey,
+                    'Content-Type': 'application/json'
+                },
+                data: {
+                    term: query,
+                    maxresults: limit,
+                    media: 0,
+                    target: 1
+                },
+                timeout: 15000
+            }, 1);
+            
+            if (response.status === 200 && response.data.id) {
+                // Get the results
+                const resultsUrl = `https://2.intelx.io/phonebook/search/result?id=${response.data.id}`;
+                const resultsResponse = await fetchWithRetry(resultsUrl, {
+                    headers: {
+                        'x-key': apiKey
+                    },
+                    timeout: 15000
+                }, 1);
+                
+                if (resultsResponse.status === 200 && resultsResponse.data.items) {
+                    return {
+                        service: 'Intelligence X',
+                        results: resultsResponse.data.items.map(item => ({
+                            type: item.type,
+                            systemid: item.systemid,
+                            selector: item.selector,
+                            bucket: item.bucket,
+                            key: item.key,
+                            media: item.media,
+                            archive: item.archive
+                        }))
+                    };
+                }
+            }
+        }
+        
+        return {
+            service: 'Intelligence X',
+            note: 'Commercial OSINT search engine - requires API key for automated access',
+            url: `https://intelx.io/?s=${encodeURIComponent(query)}`
+        };
+    } catch (e) {
+        return { error: `Intelligence X check failed: ${e.message}` };
+    }
 }
 
 // ==================== REVERSE IMAGE SEARCH ====================
 
-async function reverseImageSearch(imageUrl) {
-    const results = [];
+async function reverseImageSearch(imageUrl, options = {}) {
+    const { engines = ['all'], maxResults = 10 } = options;
     
-    const engines = [
+    const allEngines = [
         { name: 'Google Images', url: `https://www.google.com/searchbyimage?image_url=${encodeURIComponent(imageUrl)}` },
         { name: 'Yandex Images', url: `https://yandex.com/images/search?rpt=imageview&url=${encodeURIComponent(imageUrl)}` },
         { name: 'TinEye', url: `https://www.tineye.com/search?url=${encodeURIComponent(imageUrl)}` },
-        { name: 'Bing Visual Search', url: `https://www.bing.com/images/search?view=detailv2&iss=sbi&form=SBIIRP&sbisrc=UrlPaste&q=imgurl:${encodeURIComponent(imageUrl)}` }
+        { name: 'Bing Visual Search', url: `https://www.bing.com/images/search?view=detailv2&iss=sbi&form=SBIIRP&sbisrc=UrlPaste&q=imgurl:${encodeURIComponent(imageUrl)}` },
+        { name: 'SauceNAO', url: `https://saucenao.com/search.php?url=${encodeURIComponent(imageUrl)}` },
+        { name: 'IQDB', url: `https://iqdb.org/?url=${encodeURIComponent(imageUrl)}` },
+        { name: 'KarmaDecay', url: `https://karmadecay.com/search?q=${encodeURIComponent(imageUrl)}` }
     ];
-
-    engines.forEach(engine => {
+    
+    let selectedEngines = allEngines;
+    
+    if (engines !== 'all') {
+        selectedEngines = allEngines.filter(e => 
+            engines.some(engine => e.name.toLowerCase().includes(engine.toLowerCase()))
+        );
+    }
+    
+    const results = [];
+    
+    for (const engine of selectedEngines.slice(0, maxResults)) {
         results.push({
             engine: engine.name,
             searchUrl: engine.url,
             note: 'Open manually for results'
         });
-    });
-
+    }
+    
     return results;
 }
 
 // ==================== WHOIS LOOKUP ====================
 
-async function whoisLookup(domain) {
+async function whoisLookup(domain, options = {}) {
+    const { apiKey = null, includeRawData = false } = options;
+    
     try {
         console.log('   🔍 Performing WHOIS lookup...');
         
-        // Using a WHOIS API service
-        const response = await fetchWithRetry(`https://www.whoisxmlapi.com/whoisserver/WhoisService?domainName=${domain}&outputFormat=JSON`, {}, 1);
-        
-        if (response.status === 200 && response.data) {
-            return {
-                domain: domain,
-                registrar: response.data.WhoisRecord?.registrarName,
-                createdDate: response.data.WhoisRecord?.createdDate,
-                expiresDate: response.data.WhoisRecord?.expiresDate,
-                updatedDate: response.data.WhoisRecord?.updatedDate,
-                nameServers: response.data.WhoisRecord?.nameServers?.hostNames,
-                status: response.data.WhoisRecord?.status,
-                registrant: response.data.WhoisRecord?.registrant
-            };
+        if (apiKey) {
+            // Using WHOIS XML API with API key
+            const response = await fetchWithRetry(`https://www.whoisxmlapi.com/whoisserver/WhoisService?apiKey=${apiKey}&domainName=${domain}&outputFormat=JSON&registrarRawText=${includeRawData ? 1 : 0}`, {
+                timeout: 15000
+            }, 1);
+            
+            if (response.status === 200 && response.data.WhoisRecord) {
+                const record = response.data.WhoisRecord;
+                return {
+                    domain: domain,
+                    registrar: record.registrarName,
+                    createdDate: record.createdDate,
+                    expiresDate: record.expiresDate,
+                    updatedDate: record.updatedDate,
+                    nameServers: record.nameServers?.hostNames,
+                    status: record.status,
+                    registrant: record.registrant,
+                    contactEmail: record.contactEmail,
+                    dnssec: record.dnssec,
+                    rawText: includeRawData ? record.rawText : null
+                };
+            }
+        } else {
+            // Using a free WHOIS API
+            const response = await fetchWithRetry(`https://api.whoisjson.com/v1/${domain}`, {
+                timeout: 15000
+            }, 1);
+            
+            if (response.status === 200 && response.data) {
+                return {
+                    domain: domain,
+                    registrar: response.data.Registrar?.Name,
+                    createdDate: response.data.CreatedDate,
+                    expiresDate: response.data.ExpirationDate,
+                    updatedDate: response.data.UpdatedDate,
+                    nameServers: response.data.NameServers,
+                    status: response.data.Status,
+                    registrant: response.data.Registrant,
+                    contactEmail: response.data.Registrant?.ContactEmail,
+                    dnssec: response.data.DNSSEC,
+                    note: 'Limited data - API key required for full information'
+                };
+            }
         }
+        
+        // Fallback to manual lookup URL
+        return {
+            domain: domain,
+            note: 'WHOIS lookup requires API access for automated results',
+            alternative: `Manual lookup: https://who.is/whois/${domain}`
+        };
     } catch (e) {
         return {
             domain: domain,
-            note: 'WHOIS lookup requires API access',
+            error: `WHOIS lookup failed: ${e.message}`,
             alternative: `Manual lookup: https://who.is/whois/${domain}`
         };
     }
@@ -20201,12 +20933,87 @@ async function whoisLookup(domain) {
 
 // ==================== DNS ENUMERATION ====================
 
-async function dnsEnumeration(domain) {
+async function dnsEnumeration(domain, options = {}) {
+    const { maxResults = 50, customSubdomains = [], includeWildcard = false } = options;
+    
     console.log('   🔍 Enumerating DNS records...');
     
     const subdomains = [
+        // Common subdomains
         'www', 'mail', 'ftp', 'admin', 'blog', 'dev', 'test', 'staging',
         'api', 'cdn', 'shop', 'store', 'mobile', 'support', 'help',
+        'portal', 'vpn', 'remote', 'webmail', 'smtp', 'pop', 'imap',
+        'ns1', 'ns2', 'mx', 'mx1', 'mx2', 'exchange', 'email',
+        'secure', 'ssl', 'vpn', 'remote', 'ssh', 'cpanel', 'directadmin',
+        'forum', 'community', 'news', 'media', 'static', 'assets',
+        'app', 'apps', 'dashboard', 'panel', 'console', 'manage',
+        'old', 'new', 'v1', 'v2', 'v3', 'beta', 'alpha', 'demo',
+        'db', 'database', 'sql', 'mysql', 'postgres', 'mongo',
+        'cache', 'redis', 'elastic', 'search', 'log', 'logs',
+        'git', 'svn', 'ci', 'build', 'deploy', 'jenkins', 'travis',
+        'staging', 'production', 'live', 'prod', 'dev', 'development',
+        'm', 'mobile', 'touch', 'w', 'wap', 'mobi',
+        'en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja', 'ko',
+        'eu', 'us', 'uk', 'asia', 'au', 'ca', 'mx', 'br', 'ar',
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        '01', '02', '03', '04', '05', '06', '07', '08', '09',
+        '10', '11', '12', '13', '14', '15', '16', '17', '18', '19',
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+        'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+        'u', 'v', 'w', 'x', 'y', 'z',
+        'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj',
+        'kk', 'll', 'mm', 'nn', 'oo', 'pp', 'qq', 'rr', 'ss', 'tt',
+        'uu', 'vv', 'ww', 'xx', 'yy', 'zz',
+        'abc', 'xyz', 'test', 'demo', 'example', 'sample',
+        'localhost', 'local', 'internal', 'private', 'public',
+        'external', 'outside', 'inside', 'dmz', 'intranet', 'extranet',
+        'partner', 'partners', 'client', 'clients', 'customer', 'customers',
+        'supplier', 'suppliers', 'vendor', 'vendors', 'reseller', 'resellers',
+        'affiliate', 'affiliates', 'member', 'members', 'user', 'users',
+        'staff', 'employee', 'employees', 'team', 'teams', 'group', 'groups',
+        'department', 'departments', 'division', 'divisions', 'unit', 'units',
+        'office', 'offices', 'branch', 'branches', 'location', 'locations',
+        'shop', 'store', 'stores', 'market', 'markets', 'mall', 'malls',
+        'hotel', 'hotels', 'restaurant', 'restaurants', 'bar', 'bars',
+        'school', 'schools', 'university', 'universities', 'college', 'colleges',
+        'hospital', 'hospitals', 'clinic', 'clinics', 'doctor', 'doctors',
+        'bank', 'banks', 'finance', 'financial', 'insurance', 'insurances',
+        'government', 'gov', 'municipality', 'municipalities', 'city', 'cities',
+        'state', 'states', 'country', 'countries', 'region', 'regions',
+        'news', 'press', 'media', 'blog', 'blogs', 'article', 'articles',
+        'photo', 'photos', 'image', 'images', 'video', 'videos', 'audio', 'audios',
+        'download', 'downloads', 'upload', 'uploads', 'file', 'files',
+        'document', 'documents', 'pdf', 'pdfs', 'doc', 'docs',
+        'calendar', 'schedule', 'event', 'events', 'meeting', 'meetings',
+        'contact', 'contacts', 'info', 'information', 'about', 'faq',
+        'help', 'support', 'service', 'services', 'ticket', 'tickets',
+        'login', 'logout', 'signin', 'signout', 'register', 'signup',
+        'account', 'accounts', 'profile', 'profiles', 'settings', 'preferences',
+        'search', 'find', 'lookup', 'query', 'result', 'results',
+        'home', 'index', 'main', 'root', 'default', 'welcome',
+        'error', '404', '500', '503', 'maintenance', 'offline',
+        'coming-soon', 'under-construction', 'temp', 'temporary',
+        'old', 'archive', 'backup', 'legacy', 'retired', 'deprecated',
+        'new', 'latest', 'current', 'recent', 'updated', 'upgraded',
+        'beta', 'alpha', 'preview', 'demo', 'trial', 'test', 'testing',
+        'sandbox', 'dev', 'development', 'staging', 'production', 'live',
+        'internal', 'private', 'secure', 'admin', 'administrator', 'root',
+        'api', 'rest', 'soap', 'json', 'xml', 'rss', 'atom', 'feed',
+        'cdn', 'cache', 'static', 'dynamic', 'content', 'assets',
+        'css', 'js', 'javascript', 'script', 'scripts', 'style', 'styles',
+        'img', 'image', 'images', 'pic', 'pics', 'photo', 'photos',
+        'video', 'videos', 'movie', 'movies', 'stream', 'streams',
+        'audio', 'sound', 'music', 'podcast', 'podcasts',
+        'download', 'downloads', 'upload', 'uploads', 'file', 'files',
+        'ftp', 'sftp', 'ssh', 'telnet', 'rdp', 'vnc', 'remote',
+        'mail', 'email', 'webmail', 'smtp', 'pop', 'pop3', 'imap',
+        'exchange', 'outlook', 'gmail', 'yahoo', 'hotmail',
+        'db', 'database', 'sql', 'mysql', 'postgres', 'oracle',
+        'nosql', 'mongodb', 'couchdb', 'redis', 'memcached',
+        'search', 'elastic', 'solr', 'lucene', 'index', 'indices',
+        'log', 'logs', 'analytics', 'metrics', 'stats', 'statistics',
+        'monitor', 'monitoring', 'alert', 'alerts', 'notification', 'notifications',
+        'backup', 'backups', 'archive',
         'portal', 'vpn', 'remote', 'webmail', 'smtp', 'pop', 'imap'
     ];
 
@@ -20234,30 +21041,244 @@ async function dnsEnumeration(domain) {
 
 // ==================== IP GEOLOCATION ====================
 
-async function ipGeolocation(ip) {
+
+async function ipGeolocation(ip, options) {
+    if (!options) options = {};
+    
+    const useCache = options.useCache !== undefined ? options.useCache : true;
+    const cacheTime = options.cacheTime || 3600000;
+    const fallbackAPIs = options.fallbackAPIs !== undefined ? options.fallbackAPIs : true;
+    const includeVPN = options.includeVPN || false;
+    const includeWeather = options.includeWeather || false;
+
+    const cacheKey = `ip_geo_${ip}`;
+    if (useCache) {
+        const cached = getCachedData(cacheKey, cacheTime);
+        if (cached) {
+            console.log('   ✅ Using cached geolocation data');
+            return cached;
+        }
+    }
+
     try {
-        console.log('   🔍 Looking up IP geolocation...');
+        console.log(`   🔍 Looking up IP geolocation for ${ip}...`);
         
-        const response = await fetchWithRetry(`https://ipapi.co/${ip}/json/`);
+        let response = await fetchWithRetry(`https://ipapi.co/${ip}/json/`, {
+            timeout: 5000
+        });
+        
+        if (response.status === 200 && response.data && !response.data.error) {
+            const data = response.data;
+            
+            const result = {
+                success: true,
+                ip: data.ip,
+                city: data.city || 'Unknown',
+                region: data.region || 'Unknown',
+                country: data.country_name || 'Unknown',
+                countryCode: data.country_code || 'XX',
+                postal: data.postal || 'N/A',
+                latitude: data.latitude || 0,
+                longitude: data.longitude || 0,
+                timezone: data.timezone || 'UTC',
+                isp: data.org || 'Unknown ISP',
+                asn: data.asn || 'N/A',
+                currency: data.currency || 'N/A',
+                languages: data.languages || 'N/A',
+                continent: data.continent_code || 'N/A',
+                source: 'ipapi.co',
+                timestamp: Date.now()
+            };
+
+            if (includeVPN) {
+                result.vpnCheck = await checkVPN(ip);
+            }
+
+            // Optional: Get weather data
+            if (includeWeather && data.latitude && data.longitude) {
+                result.weather = await getWeatherByCoords(data.latitude, data.longitude);
+            }
+
+            // Cache the result
+            if (useCache) {
+                setCachedData(cacheKey, result);
+            }
+
+            console.log('   ✅ Geolocation lookup successful');
+            return result;
+        }
+
+        // Fallback to alternative APIs
+        if (fallbackAPIs) {
+            console.log('   ⚠️ Primary API failed, trying fallback...');
+            return await ipGeolocationFallback(ip, options);
+        }
+
+        throw new Error('Primary API returned invalid data');
+
+    } catch (e) {
+        console.error('   ❌ Geolocation error:', e.message);
+        
+        // Try fallback if enabled
+        if (fallbackAPIs) {
+            return await ipGeolocationFallback(ip, options);
+        }
+
+        return {
+            success: false,
+            error: 'Geolocation lookup failed',
+            message: e.message,
+            ip: ip
+        };
+    }
+}
+
+// Fallback API function
+async function ipGeolocationFallback(ip, options = {}) {
+    const fallbackAPIs = [
+        {
+            name: 'ip-api.com',
+            url: `http://ip-api.com/json/${ip}?fields=66846719`,
+            parser: (data) => ({
+                success: true,
+                ip: data.query,
+                city: data.city,
+                region: data.regionName,
+                country: data.country,
+                countryCode: data.countryCode,
+                postal: data.zip,
+                latitude: data.lat,
+                longitude: data.lon,
+                timezone: data.timezone,
+                isp: data.isp,
+                asn: data.as,
+                currency: data.currency,
+                continent: data.continent,
+                source: 'ip-api.com',
+                timestamp: Date.now()
+            })
+        },
+        {
+            name: 'ipwhois.app',
+            url: `https://ipwhois.app/json/${ip}`,
+            parser: (data) => ({
+                success: true,
+                ip: data.ip,
+                city: data.city,
+                region: data.region,
+                country: data.country,
+                countryCode: data.country_code,
+                postal: data.postal,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                timezone: data.timezone,
+                isp: data.isp,
+                asn: data.asn,
+                currency: data.currency,
+                source: 'ipwhois.app',
+                timestamp: Date.now()
+            })
+        }
+    ];
+
+    for (const api of fallbackAPIs) {
+        try {
+            console.log(`   🔄 Trying ${api.name}...`);
+            const response = await fetchWithRetry(api.url, { timeout: 5000 });
+            
+            if (response.status === 200 && response.data) {
+                const result = api.parser(response.data);
+                console.log(`   ✅ Success using ${api.name}`);
+                
+                // Cache if enabled
+                if (options.useCache) {
+                    setCachedData(`ip_geo_${ip}`, result);
+                }
+                
+                return result;
+            }
+        } catch (e) {
+            console.log(`   ❌ ${api.name} failed:`, e.message);
+            continue;
+        }
+    }
+
+    return {
+        success: false,
+        error: 'All geolocation APIs failed',
+        ip: ip
+    };
+}
+
+// Optional: VPN/Proxy detection
+async function checkVPN(ip) {
+    try {
+        const response = await fetchWithRetry(`https://vpnapi.io/api/${ip}`, {
+            timeout: 3000
+        });
         
         if (response.status === 200 && response.data) {
             return {
-                ip: response.data.ip,
-                city: response.data.city,
-                region: response.data.region,
-                country: response.data.country_name,
-                countryCode: response.data.country_code,
-                postal: response.data.postal,
-                latitude: response.data.latitude,
-                longitude: response.data.longitude,
-                timezone: response.data.timezone,
-                isp: response.data.org,
-                asn: response.data.asn
+                isVPN: response.data.security?.vpn || false,
+                isProxy: response.data.security?.proxy || false,
+                isTor: response.data.security?.tor || false,
+                isRelay: response.data.security?.relay || false
             };
         }
     } catch (e) {
-        return { error: 'Geolocation lookup failed' };
+        return { error: 'VPN check failed' };
     }
+}
+
+// Optional: Weather by coordinates
+async function getWeatherByCoords(lat, lon) {
+    try {
+        // Using open-meteo (free, no API key needed)
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+        const response = await fetchWithRetry(url, { timeout: 3000 });
+        
+        if (response.status === 200 && response.data?.current_weather) {
+            const weather = response.data.current_weather;
+            return {
+                temperature: weather.temperature,
+                windspeed: weather.windspeed,
+                weathercode: weather.weathercode,
+                time: weather.time
+            };
+        }
+    } catch (e) {
+        return { error: 'Weather fetch failed' };
+    }
+}
+
+// Simple cache implementation
+const geoCache = new Map();
+
+function getCachedData(key, maxAge) {
+    const cached = geoCache.get(key);
+    if (cached && (Date.now() - cached.timestamp) < maxAge) {
+        return cached.data;
+    }
+    return null;
+}
+
+function setCachedData(key, data) {
+    geoCache.set(key, {
+        data: data,
+        timestamp: Date.now()
+    });
+    
+    // Auto cleanup old cache (keep max 100 entries)
+    if (geoCache.size > 100) {
+        const firstKey = geoCache.keys().next().value;
+        geoCache.delete(firstKey);
+    }
+}
+
+// Clear cache function
+function clearGeoCache() {
+    geoCache.clear();
+    console.log('   🗑️ Geolocation cache cleared');
 }
 
 // ==================== MAIN INVESTIGATION FUNCTIONS ====================
@@ -20651,7 +21672,6 @@ async function mainMenu() {
             console.log('\n❌ Invalid option!\n');
     }
 
-    // Return to menu
     const again = await question('\nRun another investigation? (y/n): ');
     if (again.toLowerCase() === 'y') {
         await mainMenu();
